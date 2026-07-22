@@ -406,10 +406,21 @@
             } else if (status === 'complete') {
                 card.classList.remove('disabled');
                 btn.disabled = false;
-                btn.classList.add('blinking');
-                btn.className = 'clear-plate-btn blinking';
-                btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
-                btn.textContent = '🧹 Clear Plate';
+                
+                if (plateCleared) {
+                    // Show "Ready To Print" button when plate is cleared and print is complete
+                    btn.className = 'ready-to-print';
+                    btn.textContent = 'Ready To Print';
+                    btn.onclick = null;
+                    statusText.textContent = 'Druck abgeschlossen – Bereit zum Drucken';
+                } else {
+                    // Show Clear Plate button
+                    btn.classList.add('blinking');
+                    btn.className = 'clear-plate-btn blinking';
+                    btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
+                    btn.textContent = '🧹 Clear Plate';
+                    statusText.textContent = 'Druck abgeschlossen - Clear Plate wartet';
+                }
             } else {
                 // idle - check if plate has been cleared
                 card.classList.remove('disabled');
