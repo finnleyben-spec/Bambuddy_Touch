@@ -408,7 +408,7 @@
                 btn.disabled = false;
                 btn.classList.add('blinking');
                 btn.className = 'clear-plate-btn blinking';
-                btn.onclick = () => openConfirmModal(printerId, printerName);
+                btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
                 btn.textContent = '🧹 Clear Plate';
             } else {
                 // idle - check if plate has been cleared
@@ -425,7 +425,7 @@
                 } else {
                     // Show Clear Plate button
                     btn.className = 'clear-plate-btn blinking';
-                    btn.onclick = () => openConfirmModal(printerId, printerName);
+                    btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
                     btn.textContent = '🧹 Clear Plate';
                     statusText.textContent = 'Bereit zum Drucken';
                 }
