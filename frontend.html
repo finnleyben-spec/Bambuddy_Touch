@@ -358,22 +358,22 @@
             statusText.textContent = statusMessages[status] || 'Unbekannt';
 
             // Button-State anpassen
-            if (status === 'printing' || status === 'error') {
+            if (status === 'printing') {
                 card.classList.add('disabled');
                 btn.disabled = true;
                 btn.classList.remove('blinking');
-                
-                if (status === 'printing') {
-                    btn.textContent = '⏳ Druck läuft...';
-                    btn.className = 'clear-plate-btn blinking';
-                } else {
-                    // ERROR state - show reset button
-                    btn.textContent = '🔄 Reset';
-                    btn.className = 'reset-btn';
-                    btn.onclick = () => resetPrinter(printerId);
-                    statusText.classList.add('error');
-                    statusText.textContent = 'Fehler aufgetreten – Reset nötig';
-                }
+                btn.textContent = '⏳ Druck läuft...';
+                btn.className = 'clear-plate-btn blinking';
+            } else if (status === 'error') {
+                // ERROR: Reset button should be VISIBLE and ACTIVE
+                card.classList.remove('disabled');
+                btn.disabled = false;
+                btn.classList.remove('blinking');
+                btn.textContent = '🔄 Reset';
+                btn.className = 'reset-btn';
+                btn.onclick = () => resetPrinter(printerId);
+                statusText.classList.add('error');
+                statusText.textContent = 'Fehler aufgetreten – Reset nötig';
             } else if (status === 'complete') {
                 card.classList.remove('disabled');
                 btn.disabled = false;
