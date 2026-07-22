@@ -35,7 +35,7 @@
 ```bash
 # Erstelle .env manuell mit deinen Credentials!
 cat > .env << 'EOF'
-BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
+BAMBUDY_API_URL=https://DEINE-API-URL.de/api/v1
 BAMBUDY_API_KEY=DEIN_API_KEY_HIER
 EOF
 ```
@@ -60,81 +60,54 @@ cd /home/pi/bambuddy-clearplate
 python3 backend.py &
 
 # Browser öffnen:
-chromium-browser --kiosk http://localhost:8080/
 ```
 
-### Option 2: Dateien manuell erstellen
-1. `.env` mit den API-Credentials erstellen
-2. `backend.py` und `frontend.html` von diesem Verzeichnis kopieren
-3. Server starten wie oben beschrieben
+### Option 2: Manuell kopieren
+```bash
+# Dateien einzeln auf Pi kopieren:
+scp backend.py frontend.html pi@RASPBERRY-IP:/home/pi/bambuddy-clearplate/
+
+# .env manuell erstellen (NICHT scp!)
+ssh pi@RASPBERRY-IP
+cd /home/pi/bambuddy-clearplate
+nano .env  # Manuell eintragen!
+```
 
 ---
 
-## 🎯 Funktionsweise
+## 🏠 Autostart mit systemd
 
-### Architektur:
+```bash
+# Service-Datei kopieren:
+sudo cp bambuddy-clearplate.service /etc/systemd/system/
+
+# Aktivieren und starten:
+sudo systemctl daemon-reload
+sudo systemctl enable --now bambuddy-clearplate
+
+# Status prüfen:
+sudo systemctl status bambuddy-clearplate
 ```
-Browser (Raspberry Pi)
-    ↓ http://localhost:8080/
-Python Backend (hat die API-Keys!)
-    ↓ https://bambu.kronos.hs-ruhrwest.de/api/v1/printers/{id}/clear-plate
-BamBuddy Server
-```
-
-### Features:
-- ✅ 4 Drucker-Karten mit Echtzeit-Status
-- ✅ Blinkende Buttons wenn Drucker idle ist
-- ✅ Ausgegraute Buttons wenn Druck läuft (kann nicht gedrückt werden)
-- ✅ Bestätigungs-Modal vor jeder Aktion
-- ✅ API-Keys bleiben sicher auf dem Raspberry Pi
-- ✅ Status-Updates alle 30 Sekunden
-
-### Sicherheit:
-- ❌ Keine API-Keys im HTML/JavaScript
-- ❌ Kein "Rechtsklick -> Untersuchen" möglich
-- ✅ Backend servert nur lokale Dateien
-- ✅ API-Calls laufen über den Python Proxy
-- ✅ Server läuft nur lokal (localhost:8080)
 
 ---
 
-## 🐛 Bekannte Probleme & Lösungen
+## 🔧 Technische Details
 
-### Problem: "dotenv not installed"
-**Lösung:** Das Skript hat einen Fallback für manuelles Laden der .env Datei.
+### Backend Architektur
+- **Python HTTP Server** auf Port 8080
+- **Proxy-Modus**: Frontend fragt lokalen Server → Server fragt Bambu API
+- **Sicherheitsvorteil**: API-Key nie im Browser sichtbar!
 
-### Problem: API gibt 404 zurück
-**Mögliche Ursachen:**
-- Falsche API-URL oder API-Key
-- Drucker-ID existiert nicht
-- Netzwerkproblem zum Bambuddy Server
-
-### Problem: Button blinkt nicht
-**Lösung:** Stelle sicher, dass der Status "idle" ist. Der Button blinkt nur wenn der Drucker bereit ist.
-
----
-
-## 📝 Nächste Schritte (für nächste Session)
-
-### 1. GitHub einrichten
-- [ ] Git Repository erstellen
-- [ ] `.env` Datei ausschließen (.gitignore)
-- [ ] Code pushen
-
-### 2. Raspberry Pi installieren
-- [ ] Setup-Skript auf Raspberry Pi kopieren
-- [ ] Server starten und testen
-- [ ] Browser im Kiosk-Modus öffnen
-
-### 3. Optional: systemd Service
-- [ ] Automatischen Start beim Boot einrichten
-- [ ] Service als Systemd-Daemon konfigurieren
+### Frontend Features
+- Responsive Design (funktioniert auf Handy + Desktop)
+- Touch-optimierte Buttons für Raspberry Pi
+- Animierter "Clear Plate" Button mit Blink-Effekt
+- Modal-Dialog zur Bestätigung
 
 ---
 
 ## 🔗 Wichtige Links
 
-- **BamBuddy API Docs:** https://bambu.kronos.hs-ruhrwest.de/docs
 - **API Endpoint:** `POST /api/v1/printers/{printer_id}/clear-plate`
 - **Drucker IDs:** 1, 2, 3 (X1C), 4 (H2D)
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# BamBuddy Clear Plate - Setup Script
+# BamBuddy Clear Plate - Setup Script (SECURE VERSION)
 # This script creates all necessary files for the Clear Plate controller
 
 echo "🚀 Setting up Bambuddy Clear Plate Controller..."
@@ -11,13 +11,13 @@ cd /home/pi/bambuddy-clearplate
 
 # Create .env file with API credentials (USER MUST EDIT THIS!)
 cat > .env << 'EOF'
-# Bambuddy API Configuration - DO NOT SHARE THIS FILE!
-BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
+# Bambu Studio API Configuration - DO NOT SHARE THIS FILE!
+BAMBUDY_API_URL=https://DEINE-API-URL.de/api/v1
 BAMBUDY_API_KEY=DEIN_API_KEY_HIER
 EOF
 
 echo ""
-echo "⚠️  WICHTIG: Bitte trage deinen API-Key in .env ein!"
+echo "⚠️  WICHTIG: Bitte trage deine API-URL und deinen API-Key in .env ein!"
 
 # Create backend.py server script
 cat > backend.py << 'PYEOF'
@@ -54,7 +54,7 @@ if 'BAMBUDY_API_URL' not in os.environ and Path('.env').exists():
                 os.environ[key] = value
 
 # Configuration - ONLY accessible to this server
-API_URL = os.getenv('BAMBUDY_API_URL', 'https://bambu.kronos.hs-ruhrwest.de/api/v1')
+API_URL = os.getenv('BAMBUDY_API_URL', 'https://DEINE-API-URL.de/api/v1')
 API_KEY = os.getenv('BAMBUDY_API_KEY', '')
 
 if not API_KEY:
@@ -501,108 +501,3 @@ cat > frontend.html << 'HTMLEOF'
         }
 
         async function confirmClearPlate() {
-            if (!currentPrinterId) return;
-            
-            const btn = document.getElementById('confirmBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Wird gesendet...';
-
-            try {
-                const response = await fetch(`${config.apiUrl}/printers/${currentPrinterId}/clear-plate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                if (response.ok) {
-                    showSuccess();
-                    updateStatus(currentPrinterId, 'idle');
-                } else {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Error clearing plate:', error);
-                alert(`Fehler beim Clear Plate:\n${error.message}\n\nStelle sicher, dass der Proxy-Server läuft.`);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                closeModal();
-            }
-        }
-
-        function showSuccess() {
-            const successEl = document.getElementById('successAnimation');
-            successEl.classList.add('active');
-            setTimeout(() => { successEl.classList.remove('active'); }, 1500);
-        }
-
-        function updateStatus(printerId, status) {
-            const badge = document.getElementById(`status-${printerId}`);
-            const btn = document.querySelector(`[data-printer-id="${printerId}"] .clear-plate-btn`);
-            
-            if (badge) {
-                badge.className = 'status-badge';
-                switch(status.toLowerCase()) {
-                    case 'idle': badge.classList.add('status-idle'); badge.textContent = 'IDLE'; break;
-                    case 'printing': badge.classList.add('status-printing'); badge.textContent = 'PRINTING'; break;
-                    case 'error': badge.classList.add('status-error'); badge.textContent = 'ERROR'; break;
-                    case 'complete': badge.classList.add('status-complete'); badge.textContent = 'COMPLETE'; break;
-                }
-            }
-
-            if (btn) {
-                switch(status.toLowerCase()) {
-                    case 'printing': btn.disabled = true; btn.classList.remove('blinking'); btn.innerHTML = '⏸️ Druck läuft...'; break;
-                    case 'idle': btn.disabled = false; btn.classList.add('blinking'); btn.innerHTML = '🧹 Clear Plate'; break;
-                    case 'error': btn.disabled = true; btn.classList.remove('blinking'); btn.innerHTML = '⚠️ Fehler'; break;
-                }
-            }
-        }
-
-        async function fetchPrinterStatus() {
-            try {
-                const response = await fetch(`${config.apiUrl}/printers`, { headers: {} });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const printers = await response.json();
-                printers.forEach(printer => {
-                    const id = printer.id;
-                    if (printerStates[id]) {
-                        let status = 'idle';
-                        if (printer.is_active && !printer.printing) status = 'printing';
-                        else if (printer.error_state) status = 'error';
-                        
-                        printerStates[id].status = status;
-                        updateStatus(id, status);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching printer status:', error);
-            }
-        }
-
-        document.getElementById('confirmModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
-        fetchPrinterStatus();
-        setInterval(fetchPrinterStatus, 30000);
-    </script>
-</body>
-</html>
-HTMLEOF
-
-echo ""
-echo "✅ Setup complete!"
-echo ""
-echo "📁 Files created:"
-echo "   - .env (API credentials)"
-echo "   - backend.py (Python server)"
-echo "   - frontend.html (Web interface)"
-echo ""
-echo "🚀 To start the server:"
-echo "   cd /home/pi/bambuddy-clearplate"
-echo "   python3 backend.py &"
-echo ""
-echo "🌐 Then open in browser:"
-echo "   http://localhost:8080/"

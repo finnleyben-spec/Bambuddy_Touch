@@ -31,7 +31,7 @@ if 'BAMBUDY_API_URL' not in os.environ and Path('.env').exists():
                 os.environ[key] = value
 
 # Configuration - ONLY accessible to this server
-API_URL = os.getenv('BAMBUDY_API_URL', 'https://bambu.kronos.hs-ruhrwest.de/api/v1')
+API_URL = os.getenv('BAMBUDY_API_URL', 'https://DEINE-API-URL.de/api/v1')
 API_KEY = os.getenv('BAMBUDY_API_KEY', '')
 
 if not API_KEY:

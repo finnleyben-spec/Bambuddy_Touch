@@ -58,7 +58,7 @@ Die `.env` Datei enthält deine sensiblen API-Keys und wird **nicht** im Git ges
 cd /home/pi/Bambuddy_Touch  # oder /home/pi/bambuddy-clearplate
 
 cat > .env << 'EOF'
-BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
+BAMBUDY_API_URL=https://DEINE-API-URL.de/api/v1
 BAMBUDY_API_KEY=DEIN_API_KEY_HIER
 EOF
 ```
@@ -112,7 +112,7 @@ chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
 | Problem | Lösung |
 |---------|--------|
 | Server startet nicht | `sudo journalctl -u bambuddy-clearplate -n 50` prüfen |
-| Port 8080 belegt | `netstat -tlnp \| grep 8080` — anderen Port in `.env` ändern? Nein, in `backend.py` Zeile 168 anpassen |
+| Port 8080 belegt | `netstat -tlnp \| grep 8080` — anderen Port in `backend.py` Zeile 168 anpassen |
 | "Permission denied" | `sudo chmod 644 /etc/systemd/system/bambuddy-clearplate.service` |
 | API-Fehler | Prüfe ob `.env` existiert: `cat .env` — sollte `BAMBUDY_API_KEY=...` enthalten |
 
