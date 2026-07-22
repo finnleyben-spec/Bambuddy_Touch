@@ -110,7 +110,26 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def proxy_request(self, path):
         """Forward GET request to the real API."""
-        url = f"{API_URL}{path}"
+        
+        # Handle printer status endpoint specially
+        if path == '/api/printers':
+            url = f"{API_URL}/printers"
+        elif path.startswith('/api/') and 'clear-plate' in path:
+            # Extract printer ID from /api/{id}/clear-plate
+            parts = path.split('/')  # ['', 'api', '2', 'clear-plate']
+            if len(parts) >= 4:
+                printer_id = parts[2]
+                url = f"{API_URL}/printers/{printer_id}/clear-plate"
+            else:
+                raise Exception(f"Invalid path format: {path}")
+        else:
+            # Default: forward as-is (but strip /api/ prefix)
+            if path.startswith('/api/'):
+                url = f"{API_URL}{path[4:]}"  # Remove '/api' prefix
+            else:
+                url = f"{API_URL}{path}"
+        
+        print(f"📡 Proxying to: {url}")
         
         req = urllib.request.Request(url)
         req.add_header('Authorization', f'Bearer {API_KEY}')

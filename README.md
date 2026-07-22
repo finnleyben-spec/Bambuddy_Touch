@@ -107,12 +107,35 @@ chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
 
 ---
 
+## 🔄 Software aktualisieren
+
+### Einzeiler (empfohlen)
+```bash
+cd ~/Bambuddy_Touch && git pull origin main && pkill python3; sleep 1; cd /home/pi/bambuddy-clearplate && python3 backend.py &
+```
+
+### Manuell
+```bash
+# 1. Update holen:
+cd ~/Bambuddy_Touch && git pull origin main
+
+# 2. Server stoppen:
+pkill -f "python3 backend.py"
+
+# 3. Server neu starten:
+cd /home/pi/bambuddy-clearplate && python3 backend.py &
+
+# 4. Browser: Strg + Shift + R (Hard Refresh)
+```
+
+---
+
 ## 🛠️ Troubleshooting
 
 | Problem | Lösung |
 |---------|--------|
 | Server startet nicht | `sudo journalctl -u bambuddy-clearplate -n 50` prüfen |
-| Port 8080 belegt | `netstat -tlnp \| grep 8080` — anderen Port in `backend.py` Zeile 168 anpassen |
+| Port 8080 belegt | `netstat -tlnp \ | grep 8080` — anderen Port in `backend.py` Zeile 168 anpassen |
 | "Permission denied" | `sudo chmod 644 /etc/systemd/system/bambuddy-clearplate.service` |
 | API-Fehler | Prüfe ob `.env` existiert: `cat .env` — sollte `BAMBUDY_API_KEY=...` enthalten |
 
