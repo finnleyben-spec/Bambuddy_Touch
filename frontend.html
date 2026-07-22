@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bambuddy - Clear Plate</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
@@ -19,10 +15,7 @@
             color: #ffffff;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .container { max-width: 800px; margin: 0 auto; }
 
         header {
             text-align: center;
@@ -43,10 +36,7 @@
             background-clip: text;
         }
 
-        .subtitle {
-            color: #a0aec0;
-            font-size: 14px;
-        }
+        .subtitle { color: #a0aec0; font-size: 14px; }
 
         .printers-grid {
             display: grid;
@@ -70,6 +60,12 @@
             border-color: rgba(0, 212, 255, 0.3);
         }
 
+        .printer-card.disabled {
+            opacity: 0.4;
+            filter: grayscale(0.8);
+            pointer-events: none;
+        }
+
         .printer-header {
             display: flex;
             align-items: center;
@@ -77,18 +73,8 @@
             margin-bottom: 16px;
         }
 
-        .printer-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .printer-model {
-            font-size: 12px;
-            color: #a0aec0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .printer-name { font-size: 18px; font-weight: 600; color: #ffffff; }
+        .printer-model { font-size: 12px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .status-badge {
             padding: 6px 12px;
@@ -99,29 +85,10 @@
             letter-spacing: 0.5px;
         }
 
-        .status-idle {
-            background: rgba(72, 187, 120, 0.2);
-            color: #48bb78;
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
-
-        .status-printing {
-            background: rgba(56, 178, 255, 0.2);
-            color: #38b2ff;
-            border: 1px solid rgba(56, 178, 255, 0.3);
-        }
-
-        .status-error {
-            background: rgba(245, 101, 101, 0.2);
-            color: #f56565;
-            border: 1px solid rgba(245, 101, 101, 0.3);
-        }
-
-        .status-complete {
-            background: rgba(72, 187, 120, 0.2);
-            color: #48bb78;
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
+        .status-idle { background: rgba(72, 187, 120, 0.2); color: #48bb78; border: 1px solid rgba(72, 187, 120, 0.3); }
+        .status-printing { background: rgba(56, 178, 255, 0.2); color: #38b2ff; border: 1px solid rgba(56, 178, 255, 0.3); }
+        .status-error { background: rgba(245, 101, 101, 0.2); color: #f56565; border: 1px solid rgba(245, 101, 101, 0.3); }
+        .status-complete { background: rgba(72, 187, 120, 0.2); color: #48bb78; border: 1px solid rgba(72, 187, 120, 0.3); }
 
         .clear-plate-btn {
             width: 100%;
@@ -139,23 +106,10 @@
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
-        .clear-plate-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
-        }
+        .clear-plate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4); }
+        .clear-plate-btn:active:not(:disabled) { transform: translateY(0); }
+        .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: rgba(128, 128, 128, 0.3); box-shadow: none; }
 
-        .clear-plate-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .clear-plate-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: rgba(128, 128, 128, 0.3);
-            box-shadow: none;
-        }
-
-        /* Blinking animation for idle printers */
         @keyframes blink {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.7; transform: scale(0.98); }
@@ -166,14 +120,10 @@
             box-shadow: 0 0 20px rgba(72, 187, 120, 0.6), 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
-        /* Modal Styles */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(5px);
             z-index: 1000;
@@ -182,9 +132,7 @@
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -196,31 +144,11 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        .modal-icon {
-            font-size: 48px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .modal-icon { font-size: 48px; text-align: center; margin-bottom: 20px; }
+        .modal-title { font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 12px; color: #ffffff; }
+        .modal-text { color: #a0aec0; text-align: center; margin-bottom: 32px; line-height: 1.6; }
 
-        .modal-title {
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 12px;
-            color: #ffffff;
-        }
-
-        .modal-text {
-            color: #a0aec0;
-            text-align: center;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-        }
+        .modal-buttons { display: flex; gap: 12px; }
 
         .btn-cancel, .btn-confirm {
             flex: 1;
@@ -234,45 +162,24 @@
             letter-spacing: 0.5px;
         }
 
-        .btn-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #a0aec0;
-        }
-
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
+        .btn-cancel { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #a0aec0; }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.15); }
 
         .btn-confirm {
             background: linear-gradient(135deg, #48bb78 0%, #38b2ff 100%);
-            border: none;
-            color: white;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            border: none; color: white; box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
-        .btn-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4); }
 
-        /* Success Animation */
         .success-animation {
             display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #48bb78 0%, #38b2ff 100%);
-            padding: 40px;
-            border-radius: 20px;
-            z-index: 2000;
-            animation: successPulse 0.6s ease-out;
+            padding: 40px; border-radius: 20px; z-index: 2000; animation: successPulse 0.6s ease-out;
         }
 
-        .success-animation.active {
-            display: block;
-        }
+        .success-animation.active { display: block; }
 
         @keyframes successPulse {
             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
@@ -280,50 +187,22 @@
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
-        /* Loading Spinner */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Status Info */
-        .status-info {
-            margin-top: 8px;
+        .status-text {
             font-size: 12px;
             color: #a0aec0;
+            margin-top: 8px;
+            text-align: center;
         }
 
-        /* Responsive */
         @media (max-width: 640px) {
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .printers-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .printer-card {
-                padding: 20px;
-            }
-
-            .modal {
-                padding: 24px;
-            }
+            body { padding: 10px; }
+            h1 { font-size: 24px; }
+            .printers-grid { grid-template-columns: 1fr; gap: 15px; }
+            .printer-card { padding: 20px; }
+            .modal { padding: 24px; }
         }
     </style>
 </head>
@@ -334,7 +213,6 @@
             <p class="subtitle">Clear Plate Management</p>
         </header>
 
-        <!-- Printers Grid -->
         <div class="printers-grid" id="printersGrid">
             <!-- Printer 1: X1C #1 (ID: 2) -->
             <div class="printer-card" data-printer-id="2">
@@ -345,9 +223,8 @@
                     </div>
                     <span class="status-badge status-idle" id="status-2">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">
-                    🧹 Clear Plate
-                </button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">🧹 Clear Plate</button>
+                <div class="status-text" id="status-text-2">Bereit zum Drucken</div>
             </div>
 
             <!-- Printer 2: X1C #2 (ID: 1) -->
@@ -359,9 +236,8 @@
                     </div>
                     <span class="status-badge status-idle" id="status-1">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">
-                    🧹 Clear Plate
-                </button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">🧹 Clear Plate</button>
+                <div class="status-text" id="status-text-1">Bereit zum Drucken</div>
             </div>
 
             <!-- Printer 3: X1C #3 (ID: 3) -->
@@ -373,9 +249,8 @@
                     </div>
                     <span class="status-badge status-idle" id="status-3">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">
-                    🧹 Clear Plate
-                </button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">🧹 Clear Plate</button>
+                <div class="status-text" id="status-text-3">Bereit zum Drucken</div>
             </div>
 
             <!-- Printer 4: H2D (ID: 4) -->
@@ -387,9 +262,8 @@
                     </div>
                     <span class="status-badge status-idle" id="status-4">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">
-                    🧹 Clear Plate
-                </button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">🧹 Clear Plate</button>
+                <div class="status-text" id="status-text-4">Bereit zum Drucken</div>
             </div>
         </div>
     </div>
@@ -399,14 +273,10 @@
         <div class="modal">
             <div class="modal-icon">🧹</div>
             <h2 class="modal-title">Clear Plate bestätigen?</h2>
-            <p class="modal-text" id="modalText">
-                Möchtest du die Druckplatte von <strong>X1 Carbon #1</strong> als sauber markieren?
-            </p>
+            <p class="modal-text" id="modalText">Möchtest du die Druckplatte von <strong>X1 Carbon #1</strong> als sauber markieren?</p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">
-                    ✓ Bestätigen
-                </button>
+                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">✓ Bestätigen</button>
             </div>
         </div>
     </div>
@@ -417,12 +287,8 @@
     </div>
 
     <script>
-        // Configuration - NO API KEYS HERE!
-        const config = {
-            apiUrl: 'http://localhost:8080/api'  // Local proxy only
-        };
-
-        // Printer states
+        const config = { apiUrl: 'http://localhost:8080/api' };
+        
         const printerStates = {
             1: { status: 'idle', name: 'X1 Carbon #2' },
             2: { status: 'idle', name: 'X1 Carbon #1' },
@@ -430,16 +296,59 @@
             4: { status: 'idle', name: 'H2D #1' }
         };
 
-        // Modal functions
         let currentPrinterId = null;
         let currentPrinterName = null;
+
+        // Status-Texte für verschiedene Zustände
+        const statusMessages = {
+            idle: 'Bereit zum Drucken',
+            printing: 'Druckt gerade...',
+            error: 'Fehler aufgetreten',
+            complete: 'Druck abgeschlossen - Clear Plate wartet'
+        };
+
+        function updatePrinterStatus(printerId, status) {
+            const card = document.querySelector(`[data-printer-id="${printerId}"]`);
+            const badge = document.getElementById(`status-${printerId}`);
+            const statusText = document.getElementById(`status-text-${printerId}`);
+            const btn = card.querySelector('.clear-plate-btn');
+
+            if (!card || !badge || !statusText) return;
+
+            // Status aktualisieren
+            printerStates[printerId].status = status;
+
+            // Badge-Klasse anpassen
+            badge.className = `status-badge status-${status}`;
+            badge.textContent = status.toUpperCase();
+
+            // Status-Text aktualisieren
+            statusText.textContent = statusMessages[status] || 'Unbekannt';
+
+            // Button-State anpassen
+            if (status === 'printing' || status === 'error') {
+                card.classList.add('disabled');
+                btn.disabled = true;
+                btn.classList.remove('blinking');
+                btn.textContent = status === 'printing' ? '⏳ Druck läuft...' : '❌ Fehler';
+            } else if (status === 'complete') {
+                card.classList.remove('disabled');
+                btn.disabled = false;
+                btn.classList.add('blinking');
+                btn.textContent = '🧹 Clear Plate';
+            } else {
+                // idle
+                card.classList.remove('disabled');
+                btn.disabled = false;
+                btn.classList.remove('blinking');
+                btn.textContent = '🧹 Clear Plate';
+            }
+        }
 
         function openConfirmModal(printerId, printerName) {
             currentPrinterId = printerId;
             currentPrinterName = printerName;
-            
-            document.getElementById('modalText').innerHTML = 
-                `Möchtest du die Druckplatte von <strong>${printerName}</strong> als sauber markieren?`;
+            document.getElementById('modalText').innerHTML = `Möchtest du die Druckplatte von <strong>${printerName}</strong> als sauber markieren?`;
             document.getElementById('confirmModal').classList.add('active');
         }
 
@@ -452,151 +361,71 @@
         async function confirmClearPlate() {
             if (!currentPrinterId) return;
 
-            const btn = document.getElementById('confirmBtn');
-            const originalText = btn.innerHTML;
-            
-            // Show loading state
+            const btn = document.querySelector(`[data-printer-id="${currentPrinterId}"] .clear-plate-btn`);
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Wird gesendet...';
+            btn.textContent = '⏳ Wird gesendet...';
 
             try {
-                // Call local proxy - NO API KEYS exposed!
-                const response = await fetch(`${config.apiUrl}/printers/${currentPrinterId}/clear-plate`, {
+                const response = await fetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'idle' })
                 });
 
                 if (response.ok) {
-                    // Show success animation
-                    showSuccess();
-                    
-                    // Update status to idle
-                    updateStatus(currentPrinterId, 'idle');
+                    // Erfolg anzeigen
+                    document.getElementById('successAnimation').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('successAnimation').classList.remove('active');
+                    }, 2000);
+
+                    // Status auf idle setzen
+                    updatePrinterStatus(currentPrinterId, 'idle');
                 } else {
-                    throw new Error(`API Error: ${response.status}`);
+                    throw new Error('API-Fehler');
                 }
             } catch (error) {
-                console.error('Error clearing plate:', error);
-                alert(`Fehler beim Clear Plate:\n${error.message}\n\nStelle sicher, dass der Proxy-Server läuft.`);
+                alert('Fehler beim Senden des Clear Plate Befehls: ' + error.message);
             } finally {
-                // Reset button
                 btn.disabled = false;
-                btn.innerHTML = originalText;
+                btn.textContent = '🧹 Clear Plate';
                 closeModal();
             }
         }
 
-        function showSuccess() {
-            const successEl = document.getElementById('successAnimation');
-            successEl.classList.add('active');
-            
-            setTimeout(() => {
-                successEl.classList.remove('active');
-            }, 1500);
-        }
-
-        function updateStatus(printerId, status) {
-            const badge = document.getElementById(`status-${printerId}`);
-            const btn = document.querySelector(`[data-printer-id="${printerId}"] .clear-plate-btn`);
-            
-            if (badge) {
-                // Remove all status classes
-                badge.className = 'status-badge';
-                
-                // Add appropriate class
-                switch(status.toLowerCase()) {
-                    case 'idle':
-                        badge.classList.add('status-idle');
-                        badge.textContent = 'IDLE';
-                        break;
-                    case 'printing':
-                        badge.classList.add('status-printing');
-                        badge.textContent = 'PRINTING';
-                        break;
-                    case 'error':
-                        badge.classList.add('status-error');
-                        badge.textContent = 'ERROR';
-                        break;
-                    case 'complete':
-                        badge.classList.add('status-complete');
-                        badge.textContent = 'COMPLETE';
-                        break;
-                }
-            }
-
-            // Update button state based on status
-            if (btn) {
-                switch(status.toLowerCase()) {
-                    case 'printing':
-                        btn.disabled = true;
-                        btn.classList.remove('blinking');
-                        btn.innerHTML = '⏸️ Druck läuft...';
-                        break;
-                    case 'idle':
-                        btn.disabled = false;
-                        btn.classList.add('blinking');
-                        btn.innerHTML = '🧹 Clear Plate';
-                        break;
-                    case 'error':
-                        btn.disabled = true;
-                        btn.classList.remove('blinking');
-                        btn.innerHTML = '⚠️ Fehler';
-                        break;
-                }
-            }
-        }
-
-        // Fetch printer status from local proxy (read-only)
-        async function fetchPrinterStatus() {
+        // Status automatisch aktualisieren (alle 5 Sekunden)
+        async function pollPrinterStatus() {
             try {
-                const response = await fetch(`${config.apiUrl}/printers`, {
-                    headers: {}  // No auth needed - handled by backend!
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const printers = await response.json();
-                
-                // Update each printer's status
-                printers.forEach(printer => {
-                    const id = printer.id;
-                    if (printerStates[id]) {
-                        // Determine status based on printer data
-                        let status = 'idle';
-                        
-                        // Check for active print job or error state
-                        if (printer.is_active && !printer.printing) {
-                            status = 'printing';
-                        } else if (printer.error_state) {
-                            status = 'error';
-                        } else {
-                            status = 'idle';
+                const response = await fetch(`${config.apiUrl}/printers`);
+                if (response.ok) {
+                    const printers = await response.json();
+                    
+                    printers.forEach(printer => {
+                        if (printer.id && printerStates[printer.id]) {
+                            updatePrinterStatus(printer.id, printer.status || 'idle');
                         }
-                        
-                        printerStates[id].status = status;
-                        updateStatus(id, status);
-                    }
-                });
+                    });
+                }
             } catch (error) {
-                console.error('Error fetching printer status:', error);
-                // Keep current state if fetch fails
+                console.error('Fehler beim Abrufen des Status:', error);
             }
         }
 
-        // Close modal on outside click
-        document.getElementById('confirmModal').addEventListener('click', function(e) {
-            if (e.target === this) {
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ersten Poll sofort starten
+            pollPrinterStatus();
+            
+            // Regelmäßig aktualisieren (alle 5 Sekunden)
+            setInterval(pollPrinterStatus, 5000);
+        });
+
+        // Modal schließen bei Klick außerhalb
+        document.getElementById('confirmModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('confirmModal')) {
                 closeModal();
             }
         });
-
-        // Initialize - fetch status every 30 seconds
-        fetchPrinterStatus();
-        setInterval(fetchPrinterStatus, 30000);
     </script>
 </body>
 </html>
