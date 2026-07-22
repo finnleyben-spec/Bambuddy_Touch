@@ -132,7 +132,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         print(f"📡 Proxying to: {url}")
         
         req = urllib.request.Request(url)
-        req.add_header('Authorization', f'Bearer {API_KEY}')
+        # Try X-API-Key first, fallback to Bearer token
+        if API_KEY.startswith('eyJ'):  # JWT token from login
+            req.add_header('Authorization', f'Bearer {API_KEY}')
+        else:
+            req.add_header('X-API-Key', API_KEY)
         req.add_header('Accept', 'application/json')
         
         try:
@@ -148,7 +152,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         url = f"{API_URL}{path}"
         
         req = urllib.request.Request(url, data=body.encode(), method='POST')
-        req.add_header('Authorization', f'Bearer {API_KEY}')
+        req.add_header('X-API-Key', API_KEY)
         req.add_header('Content-Type', 'application/json')
         req.add_header('Accept', 'application/json')
         
