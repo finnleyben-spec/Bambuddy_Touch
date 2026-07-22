@@ -13,6 +13,8 @@ import json
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
+import urllib.request
+import urllib.error
 
 # Load .env file securely (only server-side)
 try:
@@ -74,10 +76,6 @@ def do_login():
         return False
 
 
-# Simple HTTP client using urllib (no external dependencies)
-import urllib.request
-import urllib.error
-
 # Try login at startup if credentials provided
 if AUTH_USERNAME and AUTH_PASSWORD:
     do_login()
@@ -123,7 +121,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             except Exception as e:
                 print(f"❌ API Error: {e}")
         
-        # Serve other static files
+        # Serve other static files (NOT /api/ paths)
         if self.path.startswith('/') and not self.path.startswith('/api/'):
             filename = self.path.lstrip('/')
             if os.path.exists(filename):
@@ -161,33 +159,41 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     def proxy_request(self, path):
         """Forward GET request to the real API."""
         
-        # Handle printer status endpoint specially
-        if path == '/api/printers':
-            url = f"{API_URL}/printers/"  # Add trailing slash!
-        elif path.startswith('/api/printers/') and path.endswith('/status'):
-            # Extract printer ID from /api/printers/{id}/status
+        # Handle printer status endpoint specially: /api/printers/{id}/status
+        if path.startswith('/api/printers/') and path.endswith('/status'):
             parts = path.split('/')  # ['', 'api', 'printers', '1', 'status']
             if len(parts) >= 5:
                 printer_id = parts[3]
                 url = f"{API_URL}/printers/{printer_id}/status"
             else:
                 raise Exception(f"Invalid path format: {path}")
+        # Handle clear-plate GET: /api/printers/{id}/clear-plate/
+        elif path.startswith('/api/printers/') and 'clear-plate' in path:
+            parts = path.split('/')  # ['', 'api', 'printers', '1', 'clear-plate']
+            if len(parts) >= 5:
+                printer_id = parts[3]
+                url = f"{API_URL}/printers/{printer_id}/clear-plate/"
+            else:
+                raise Exception(f"Invalid path format: {path}")
+        # Legacy clear-plate: /api/{id}/clear-plate/
         elif path.startswith('/api/') and 'clear-plate' in path:
-            # Extract printer ID from /api/{id}/clear-plate
             parts = path.split('/')  # ['', 'api', '2', 'clear-plate']
             if len(parts) >= 4:
                 printer_id = parts[2]
-                url = f"{API_URL}/printers/{printer_id}/clear-plate/"  # Add trailing slash!
+                url = f"{API_URL}/printers/{printer_id}/clear-plate/"
             else:
                 raise Exception(f"Invalid path format: {path}")
+        # List printers: /api/printers -> /api/v1/printers/
+        elif path == '/api/printers':
+            url = f"{API_URL}/printers/"
         else:
-            # Default: forward as-is (but strip /api/ prefix)
+            # Default: forward as-is (strip /api/ prefix)
             if path.startswith('/api/'):
-                url = f"{API_URL}{path[4:]}/"  # Remove '/api' prefix and add trailing slash
+                url = f"{API_URL}{path[4:]}/"
             else:
                 url = f"{API_URL}{path}"
         
-        print(f"📡 Proxying to: {url}")
+        print(f"📡 Proxying GET to: {url}")
         
         req = urllib.request.Request(url)
         headers = self.get_auth_headers()
@@ -205,17 +211,26 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     def proxy_request_with_body(self, path, body):
         """Forward POST request to the real API."""
         
-        # Handle clear-plate endpoint specially (extract printer ID)
+        # Handle clear-plate endpoint (with or without trailing slash)
         if 'clear-plate' in path:
-            parts = path.split('/')  # ['', 'api', '1', 'clear-plate']
-            if len(parts) >= 4:
+            parts = path.split('/')  # ['', 'api', '1', 'clear-plate'] or ['', 'api', 'printers', '1', 'clear-plate']
+            
+            # Check if it's /api/printers/{id}/clear-plate format
+            if len(parts) >= 5 and parts[2] == 'printers':
+                printer_id = parts[3]
+                url = f"{API_URL}/printers/{printer_id}/clear-plate"
+            elif len(parts) >= 4:
+                # It's /api/{id}/clear-plate format - convert to proper format
                 printer_id = parts[2]
                 url = f"{API_URL}/printers/{printer_id}/clear-plate"
             else:
                 raise Exception(f"Invalid path format: {path}")
         else:
             # Default: forward as-is (no trailing slash for POST)
-            url = f"{API_URL}{path}"
+            if path.startswith('/api/'):
+                url = f"{API_URL}{path[4:]}"  # Remove '/api' prefix
+            else:
+                url = f"{API_URL}{path}"
         
         print(f"📡 Proxying POST to: {url}")
         

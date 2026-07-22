@@ -121,6 +121,36 @@
             box-shadow: 0 0 20px rgba(72, 187, 120, 0.6), 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
+        .reset-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4); }
+
+        .error-icon { 
+            font-size: 32px; 
+            text-align: center; 
+            margin-bottom: 8px;
+            color: #fc8181;
+        }
+
+        .status-text.error { 
+            color: #fc8181; 
+            font-weight: 500;
+        }
+
         .modal-overlay {
             display: none;
             position: fixed;
@@ -332,17 +362,32 @@
                 card.classList.add('disabled');
                 btn.disabled = true;
                 btn.classList.remove('blinking');
-                btn.textContent = status === 'printing' ? '⏳ Druck läuft...' : '❌ Fehler';
+                
+                if (status === 'printing') {
+                    btn.textContent = '⏳ Druck läuft...';
+                    btn.className = 'clear-plate-btn blinking';
+                } else {
+                    // ERROR state - show reset button
+                    btn.textContent = '🔄 Reset';
+                    btn.className = 'reset-btn';
+                    btn.onclick = () => resetPrinter(printerId);
+                    statusText.classList.add('error');
+                    statusText.textContent = 'Fehler aufgetreten – Reset nötig';
+                }
             } else if (status === 'complete') {
                 card.classList.remove('disabled');
                 btn.disabled = false;
                 btn.classList.add('blinking');
+                btn.className = 'clear-plate-btn blinking';
+                btn.onclick = () => openConfirmModal(printerId, printerName);
                 btn.textContent = '🧹 Clear Plate';
             } else {
                 // idle
                 card.classList.remove('disabled');
                 btn.disabled = false;
                 btn.classList.remove('blinking');
+                btn.className = 'clear-plate-btn blinking';
+                btn.onclick = () => openConfirmModal(printerId, printerName);
                 btn.textContent = '🧹 Clear Plate';
             }
         }
@@ -392,6 +437,47 @@
                 btn.disabled = false;
                 btn.textContent = '🧹 Clear Plate';
                 closeModal();
+            }
+        }
+
+        async function resetPrinter(printerId) {
+            const card = document.querySelector(`[data-printer-id="${printerId}"]`);
+            const btn = card.querySelector('.reset-btn');
+            
+            if (!btn || btn.disabled) return;
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Reset wird gesendet...';
+
+            try {
+                // Call the clear-plate endpoint without trailing slash (works for reset)
+                const response = await fetch(`${config.apiUrl}/printers/${printerId}/clear-plate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ state: 'IDLE' })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Show success animation
+                    document.getElementById('successAnimation').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('successAnimation').classList.remove('active');
+                    }, 2000);
+
+                    // Wait a moment for the API to update, then poll again
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Force status refresh
+                    await pollPrinterStatus();
+                } else {
+                    throw new Error('API-Fehler');
+                }
+            } catch (error) {
+                alert('Fehler beim Reset: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '🔄 Reset';
             }
         }
 
