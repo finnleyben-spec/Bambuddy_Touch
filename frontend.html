@@ -139,6 +139,35 @@
 
         .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4); }
 
+        /* Ready To Print button - subtle and distinct */
+        .ready-to-print {
+            width: 100%;
+            padding: 16px 24px;
+            background: rgba(72, 187, 120, 0.05);
+            border: 1px solid rgba(72, 187, 120, 0.15);
+            border-radius: 12px;
+            color: #68d391;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: default;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ready-to-print::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #48bb78;
+            box-shadow: 0 0 8px rgba(72, 187, 120, 0.6);
+        }
+
         .error-icon { 
             font-size: 32px; 
             text-align: center; 
@@ -242,7 +271,7 @@
         <header>
             <h1>🖨️ Bambuddy Control</h1>
             <p class="subtitle">Clear Plate Management</p>
-            <p style="font-size: 11px; color: #718096; margin-top: 8px;" id="versionDisplay">v2.1.0</p>
+            <p style="font-size: 11px; color: #718096; margin-top: 8px;" id="versionDisplay">v2.2.0</p>
         </header>
 
         <div class="printers-grid" id="printersGrid">
@@ -339,11 +368,11 @@
             complete: 'Druck abgeschlossen - Clear Plate wartet'
         };
 
-        function updatePrinterStatus(printerId, status) {
+        function updatePrinterStatus(printerId, status, plateCleared = false) {
             const card = document.querySelector(`[data-printer-id="${printerId}"]`);
             const badge = document.getElementById(`status-${printerId}`);
             const statusText = document.getElementById(`status-text-${printerId}`);
-            const btn = card.querySelector('.clear-plate-btn');
+            let btn = card.querySelector('.clear-plate-btn, .reset-btn, .ready-to-print');
 
             if (!card || !badge || !statusText) return;
 
@@ -382,13 +411,24 @@
                 btn.onclick = () => openConfirmModal(printerId, printerName);
                 btn.textContent = '🧹 Clear Plate';
             } else {
-                // idle
+                // idle - check if plate has been cleared
                 card.classList.remove('disabled');
                 btn.disabled = false;
                 btn.classList.remove('blinking');
-                btn.className = 'clear-plate-btn blinking';
-                btn.onclick = () => openConfirmModal(printerId, printerName);
-                btn.textContent = '🧹 Clear Plate';
+                
+                if (plateCleared) {
+                    // Show "Ready To Print" button when plate is cleared and printer is idle
+                    btn.className = 'ready-to-print';
+                    btn.textContent = 'Ready To Print';
+                    btn.onclick = null;
+                    statusText.textContent = 'Druckplatte bereit – Bereit zum Drucken';
+                } else {
+                    // Show Clear Plate button
+                    btn.className = 'clear-plate-btn blinking';
+                    btn.onclick = () => openConfirmModal(printerId, printerName);
+                    btn.textContent = '🧹 Clear Plate';
+                    statusText.textContent = 'Bereit zum Drucken';
+                }
             }
         }
 
@@ -500,6 +540,9 @@
                             const bedTarget = data.temperatures?.bed_target || 0;
                             const isIdleByTemp = (nozzleTarget === 0 && bedTarget === 0);
                             
+                            // Check if plate has been cleared
+                            const plateCleared = data.awaiting_plate_clear === false;
+                            
                             if (data.state === 'RUNNING') {
                                 status = 'printing';
                             } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
@@ -508,9 +551,8 @@
                             } else if (data.progress >= 100) {
                                 status = 'complete';
                             }
-                            // If state is FAILED but temps are 0, it's actually IDLE - no need to show error
                             
-                            updatePrinterStatus(id, status);
+                            updatePrinterStatus(id, status, plateCleared);
                         }
                     } catch (err) {
                         console.error(`Fehler beim Abrufen Status für Drucker ${id}:`, err);
