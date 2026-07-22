@@ -196,8 +196,20 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def proxy_request_with_body(self, path, body):
         """Forward POST request to the real API."""
-        # POST endpoints do NOT need trailing slash (unlike GET)
-        url = f"{API_URL}{path}"
+        
+        # Handle clear-plate endpoint specially (extract printer ID)
+        if 'clear-plate' in path:
+            parts = path.split('/')  # ['', 'api', '1', 'clear-plate']
+            if len(parts) >= 4:
+                printer_id = parts[2]
+                url = f"{API_URL}/printers/{printer_id}/clear-plate"
+            else:
+                raise Exception(f"Invalid path format: {path}")
+        else:
+            # Default: forward as-is (no trailing slash for POST)
+            url = f"{API_URL}{path}"
+        
+        print(f"📡 Proxying POST to: {url}")
         
         req = urllib.request.Request(url, data=body.encode(), method='POST')
         headers = self.get_auth_headers()
