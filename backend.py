@@ -196,6 +196,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def proxy_request_with_body(self, path, body):
         """Forward POST request to the real API."""
+        # POST endpoints do NOT need trailing slash (unlike GET)
         url = f"{API_URL}{path}"
         
         req = urllib.request.Request(url, data=body.encode(), method='POST')
