@@ -494,13 +494,21 @@
                             
                             // Map API state to our status format
                             let status = 'idle';
+                            
+                            // Check target temperatures - if both are 0, printer is idle
+                            const nozzleTarget = data.temperatures?.nozzle_target || 0;
+                            const bedTarget = data.temperatures?.bed_target || 0;
+                            const isIdleByTemp = (nozzleTarget === 0 && bedTarget === 0);
+                            
                             if (data.state === 'RUNNING') {
                                 status = 'printing';
-                            } else if (data.state === 'FAILED' || data.state === 'ERROR') {
+                            } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
+                                // Only show error if temperatures are still active (not just stuck in FAILED state)
                                 status = 'error';
                             } else if (data.progress >= 100) {
                                 status = 'complete';
                             }
+                            // If state is FAILED but temps are 0, it's actually IDLE - no need to show error
                             
                             updatePrinterStatus(id, status);
                         }
