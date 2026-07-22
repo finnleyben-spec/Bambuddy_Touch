@@ -77,18 +77,19 @@
         .printer-model { font-size: 12px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            opacity: 0.7;
         }
 
-        .status-idle { background: rgba(72, 187, 120, 0.2); color: #48bb78; border: 1px solid rgba(72, 187, 120, 0.3); }
-        .status-printing { background: rgba(56, 178, 255, 0.2); color: #38b2ff; border: 1px solid rgba(56, 178, 255, 0.3); }
-        .status-error { background: rgba(245, 101, 101, 0.2); color: #f56565; border: 1px solid rgba(245, 101, 101, 0.3); }
-        .status-complete { background: rgba(72, 187, 120, 0.2); color: #48bb78; border: 1px solid rgba(72, 187, 120, 0.3); }
+        .status-idle { background: rgba(72, 187, 120, 0.1); color: #68d391; border: 1px solid rgba(72, 187, 120, 0.2); }
+        .status-printing { background: rgba(56, 178, 255, 0.1); color: #63b3ed; border: 1px solid rgba(56, 178, 255, 0.2); }
+        .status-error { background: rgba(245, 101, 101, 0.1); color: #fc8181; border: 1px solid rgba(245, 101, 101, 0.2); }
+        .status-complete { background: rgba(72, 187, 120, 0.1); color: #68d391; border: 1px solid rgba(72, 187, 120, 0.2); }
 
         .clear-plate-btn {
             width: 100%;
@@ -211,7 +212,7 @@
         <header>
             <h1>🖨️ Bambuddy Control</h1>
             <p class="subtitle">Clear Plate Management</p>
-            <p style="font-size: 11px; color: #718096; margin-top: 8px;">v2.0.0 | Trailing-Slash-Fix</p>
+            <p style="font-size: 11px; color: #718096; margin-top: 8px;" id="versionDisplay">v2.1.0</p>
         </header>
 
         <div class="printers-grid" id="printersGrid">
@@ -394,7 +395,7 @@
             }
         }
 
-        // Status automatisch aktualisieren (alle 5 Sekunden)
+        // Status automatisch aktualisieren (alle 10 Sekunden)
         async function pollPrinterStatus() {
             try {
                 const response = await fetch(`${config.apiUrl}/printers`);
@@ -417,8 +418,8 @@
             // Ersten Poll sofort starten
             pollPrinterStatus();
             
-            // Regelmäßig aktualisieren (alle 5 Sekunden)
-            setInterval(pollPrinterStatus, 5000);
+            // Regelmäßig aktualisieren (alle 10 Sekunden)
+            setInterval(pollPrinterStatus, 10000);
         });
 
         // Modal schließen bei Klick außerhalb
