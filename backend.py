@@ -124,7 +124,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
                 print(f"❌ API Error: {e}")
         
         # Serve other static files
-        if self.path.startswith('/'):
+        if self.path.startswith('/') and not self.path.startswith('/api/'):
             filename = self.path.lstrip('/')
             if os.path.exists(filename):
                 self.serve_file(filename)
@@ -164,6 +164,14 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         # Handle printer status endpoint specially
         if path == '/api/printers':
             url = f"{API_URL}/printers/"  # Add trailing slash!
+        elif path.startswith('/api/printers/') and path.endswith('/status'):
+            # Extract printer ID from /api/printers/{id}/status
+            parts = path.split('/')  # ['', 'api', 'printers', '1', 'status']
+            if len(parts) >= 5:
+                printer_id = parts[3]
+                url = f"{API_URL}/printers/{printer_id}/status"
+            else:
+                raise Exception(f"Invalid path format: {path}")
         elif path.startswith('/api/') and 'clear-plate' in path:
             # Extract printer ID from /api/{id}/clear-plate
             parts = path.split('/')  # ['', 'api', '2', 'clear-plate']

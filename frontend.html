@@ -398,15 +398,29 @@
         // Status automatisch aktualisieren (alle 10 Sekunden)
         async function pollPrinterStatus() {
             try {
-                const response = await fetch(`${config.apiUrl}/printers`);
-                if (response.ok) {
-                    const printers = await response.json();
-                    
-                    printers.forEach(printer => {
-                        if (printer.id && printerStates[printer.id]) {
-                            updatePrinterStatus(printer.id, printer.status || 'idle');
+                const printerIds = [1, 2, 3, 4];
+                
+                for (const id of printerIds) {
+                    try {
+                        const response = await fetch(`${config.apiUrl}/printers/${id}/status`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            // Map API state to our status format
+                            let status = 'idle';
+                            if (data.state === 'RUNNING') {
+                                status = 'printing';
+                            } else if (data.state === 'FAILED' || data.state === 'ERROR') {
+                                status = 'error';
+                            } else if (data.progress >= 100) {
+                                status = 'complete';
+                            }
+                            
+                            updatePrinterStatus(id, status);
                         }
-                    });
+                    } catch (err) {
+                        console.error(`Fehler beim Abrufen Status für Drucker ${id}:`, err);
+                    }
                 }
             } catch (error) {
                 console.error('Fehler beim Abrufen des Status:', error);
