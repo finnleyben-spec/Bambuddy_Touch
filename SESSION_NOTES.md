@@ -3,11 +3,11 @@
 ## 📋 Zusammenfassung der Session
 
 ### Was wir gemacht haben:
-- ✅ Bambuddy API-Dokumentation studiert (Clear Plate Endpoint gefunden)
+- ✅ Bambu Studio API-Dokumentation studiert (Clear Plate Endpoint gefunden)
 - ✅ Sichere Architektur mit lokalem Python Proxy-Server geplant
 - ✅ Backend-Server (`backend.py`) erstellt - verbirgt API-Keys vor dem Browser
 - ✅ Frontend-Seite (`frontend.html`) erstellt - schönes Design mit blinkenden Buttons
-- ✅ `.env` Datei mit API-Credentials erstellt
+- ✅ `.env` Datei Template für API-Credentials erstellt (NICHT committen!)
 - ✅ Setup-Skript (`setup.sh`) für einfache Installation auf Raspberry Pi
 
 ### Wichtige Erkenntnisse:
@@ -33,9 +33,14 @@
 ## 🔐 Konfiguration (.env)
 
 ```bash
+# Erstelle .env manuell mit deinen Credentials!
+cat > .env << 'EOF'
 BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
-BAMBUDY_API_KEY=bb_2mtNCBXPxgm3TXwfhNZ7rjj-CUPn5kF9GVO7082fll4
+BAMBUDY_API_KEY=DEIN_API_KEY_HIER
+EOF
 ```
+
+**⚠️ WICHTIG:** Die `.env` Datei wird NICHT im Git gespeichert! Trage deinen API-Key manuell ein.
 
 ---
 

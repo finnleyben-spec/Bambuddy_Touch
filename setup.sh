@@ -9,12 +9,15 @@ echo ""
 mkdir -p /home/pi/bambuddy-clearplate
 cd /home/pi/bambuddy-clearplate
 
-# Create .env file with API credentials
+# Create .env file with API credentials (USER MUST EDIT THIS!)
 cat > .env << 'EOF'
 # Bambuddy API Configuration - DO NOT SHARE THIS FILE!
 BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
-BAMBUDY_API_KEY=bb_2mtNCBXPxgm3TXwfhNZ7rjj-CUPn5kF9GVO7082fll4
+BAMBUDY_API_KEY=DEIN_API_KEY_HIER
 EOF
+
+echo ""
+echo "⚠️  WICHTIG: Bitte trage deinen API-Key in .env ein!"
 
 # Create backend.py server script
 cat > backend.py << 'PYEOF'

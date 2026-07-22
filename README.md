@@ -1,64 +1,83 @@
 # 🖨️ Bambuddy Clear Plate Controller
 
-Ein Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die Bambu Studio API. Besonders geeignet für den Einsatz auf dem Raspberry Pi mit Touchscreen.
+Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimiert für Raspberry Pi mit Touchscreen.
 
-## ✨ Features
+## ⚠️ WICHTIG: Private Repo
 
-- **Multi-Printer Support** — Steuerung mehrerer Drucker gleichzeitig
-- **Clear Plate Funktion** — Markiere Druckplatten als "leer" nach dem Druck
-- **Echtzeit-Status** — Zeigt aktuellen Status jedes Druckers an
-- **Touch-optimiert** — Perfekt für Raspberry Pi Touchscreens
-- **Sicher** — API-Credentials bleiben serverseitig, nie im Browser sichtbar
+Dieses Repository ist **privat**. Die `.env` Datei mit den API-Credentials wird **nicht** im Git gespeichert (`.gitignore`). Du musst sie manuell auf den Raspberry Pi kopieren!
 
-## 📋 Voraussetzungen
+---
 
-- Python 3.7+ (vorinstalliert auf Raspberry Pi OS)
-- Raspberry Pi mit Netzwerkzugang
-- Bambu Lab Drucker mit Bambu Studio API aktiviert
+## 📁 Dateien-Übersicht
 
-## 🚀 Installation
+| Datei | Zweck | Muss auf PI sein? | Wie kopieren |
+|-------|-------|:-----------------:|--------------|
+| `backend.py` | Python Proxy-Server (Port 8080) | ✅ Ja | Git clone oder manuell |
+| `frontend.html` | Web-Oberfläche (Touch-optimiert) | ✅ Ja | Git clone oder manuell |
+| `.env` | **API-Credentials** 🔐 | ✅ Ja | **Manuell erstellen!** |
+| `.gitignore` | Schützt .env vor Git | ❌ Nein | Wird mit git clone mitgenommen |
+| `README.md` | Diese Anleitung | ❌ Nein | Optional |
+| `bambuddy-clearplate.service` | systemd Autostart | ❌ Nein | Manuell kopieren nach `/etc/systemd/system/` |
 
-### 1. Repository klonen
+---
+
+## 🚀 Installation auf Raspberry Pi
+
+### Option 1: Git Clone (empfohlen)
 
 ```bash
+# Repository klonen (privat — GitHub fragt nach Login)
 cd /home/pi
 git clone https://github.com/finnleyben-spec/Bambuddy_Touch.git
 cd Bambuddy_Touch
 ```
 
-### 2. API-Credentials konfigurieren
+### Option 2: Manuell kopieren
 
-Erstelle die `.env` Datei mit deinen Bambu Studio Credentials:
+Lade die Dateien einzeln herunter oder kopiere sie per USB/SFTP:
 
 ```bash
+# Verzeichnis erstellen
+mkdir -p /home/pi/bambuddy-clearplate
+cd /home/pi/bambuddy-clearplate
+
+# Dateien hier ablegen:
+# - backend.py
+# - frontend.html
+```
+
+---
+
+## 🔐 API-Credentials einrichten (manuell!)
+
+Die `.env` Datei enthält deine sensiblen API-Keys und wird **nicht** im Git gespeichert. Du musst sie manuell auf den Raspberry Pi kopieren!
+
+### Erstelle die .env manuell:
+
+```bash
+cd /home/pi/Bambuddy_Touch  # oder /home/pi/bambuddy-clearplate
+
 cat > .env << 'EOF'
 BAMBUDY_API_URL=https://bambu.kronos.hs-ruhrwest.de/api/v1
-BAMBUDY_API_KEY=dein_api_key_hier
+BAMBUDY_API_KEY=DEIN_API_KEY_HIER
 EOF
 ```
 
-**Wichtig:** Die `.env` Datei ist im `.gitignore`, also werden deine Credentials nicht mitgepushed!
+**Ersetze `DEIN_API_KEY_HIER` durch deinen echten Bambu Studio API-Key!**
 
-### 3. Server starten
-
-```bash
-python3 backend.py
-```
-
-Der Server läuft jetzt auf `http://localhost:8080`
+---
 
 ## 🏠 Autostart einrichten (systemd)
 
-Damit der Server automatisch beim Systemstart startet und bei Crash neustartet:
+Damit der Server automatisch beim Systemstart startet:
 
 ```bash
-# Service-Datei installieren
+# Service-Datei in systemd kopieren
 sudo cp bambuddy-clearplate.service /etc/systemd/system/
 
-# Service aktivieren und starten
+# Daemon neu laden, aktivieren und starten
 sudo systemctl daemon-reload
-sudo systemctl enable bambuddy-clearplate
-sudo systemctl start bambuddy-clearplate
+sudo systemctl enable --now bambuddy-clearplate
 
 # Status prüfen
 sudo systemctl status bambuddy-clearplate
@@ -67,104 +86,47 @@ sudo systemctl status bambuddy-clearplate
 ### Logs anzeigen
 
 ```bash
-# Live-Logs
-sudo journalctl -u bambuddy-clearplate -f
-
-# Letzte Einträge
-sudo journalctl -u bambuddy-clearplate --since today
+sudo journalctl -u bambuddy-clearplate -f    # Live-Logs
+sudo journalctl -u bambuddy-clearplate --since today  # Heute
 ```
+
+---
 
 ## 🌐 Zugriff
 
-Öffne im Browser:
+| Methode | URL |
+|---------|-----|
+| Auf dem Pi (Browser) | `http://localhost:8080` |
+| Im lokalen Netzwerk | `http://<raspberry-pi-ip>:8080` |
 
-- **Auf dem Raspberry Pi:** `http://localhost:8080`
-- **Im lokalen Netzwerk:** `http://<raspberry-pi-ip>:8080`
-
-### Touchscreen optimieren (optional)
-
-Für einen kiosk-modus ohne Adressleiste:
+### Kiosk-Modus (Touchscreen, Fullscreen)
 
 ```bash
-# Chromium im Kiosk-Modus starten
 chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
 ```
 
-## 📁 Projektstruktur
-
-```
-Bambuddy_Touch/
-├── backend.py          # Python Proxy-Server (Port 8080)
-├── frontend.html       # Web-Oberfläche (Touch-optimiert)
-├── .env                # API-Credentials (NICHT committen!)
-├── .gitignore          # Schützt die .env Datei
-├── README.md           # Diese Datei
-└── bambuddy-clearplate.service  # systemd Service für Autostart
-```
-
-## 🔧 Konfiguration
-
-### Drucker anpassen
-
-In der `frontend.html` kannst du die Drucker-Konfiguration ändern:
-
-```javascript
-const printerStates = {
-    1: { status: 'idle', name: 'X1 Carbon #2' },
-    2: { status: 'idle', name: 'X1 Carbon #1' },
-    // ... weitere Drucker
-};
-```
-
-### API-Endpoint ändern
-
-In der `.env` Datei:
-
-```bash
-BAMBUDY_API_URL=https://deine-api-url.de/api/v1
-```
+---
 
 ## 🛠️ Troubleshooting
 
-### Server startet nicht
+| Problem | Lösung |
+|---------|--------|
+| Server startet nicht | `sudo journalctl -u bambuddy-clearplate -n 50` prüfen |
+| Port 8080 belegt | `netstat -tlnp \| grep 8080` — anderen Port in `.env` ändern? Nein, in `backend.py` Zeile 168 anpassen |
+| "Permission denied" | `sudo chmod 644 /etc/systemd/system/bambuddy-clearplate.service` |
+| API-Fehler | Prüfe ob `.env` existiert: `cat .env` — sollte `BAMBUDY_API_KEY=...` enthalten |
 
-```bash
-# Logs prüfen
-sudo journalctl -u bambuddy-clearplate -n 50
-
-# Port prüfen (muss frei sein)
-netstat -tlnp | grep 8080
-```
-
-### "Permission denied" bei systemd
-
-```bash
-# Service-Datei Rechte setzen
-sudo chmod 644 /etc/systemd/system/bambuddy-clearplate.service
-```
-
-### API-Fehler
-
-Die `.env` Datei muss korrekt sein:
-```bash
-cat .env
-# Sollte enthalten: BAMBUDY_API_KEY=dein_key
-```
+---
 
 ## 🔒 Sicherheit
 
-- **API-Credentials** bleiben auf dem Raspberry Pi, nie im Browser sichtbar
-- **Keine externen Abhängigkeiten** — nur Python Standardbibliothek
-- **Lokaler Zugriff** — Server hört nur auf `127.0.0.1` (localhost)
+- ✅ **API-Credentials** bleiben auf dem Pi, nie im Browser sichtbar
+- ✅ **Keine externen Abhängigkeiten** — nur Python Standardbibliothek
+- ✅ **Lokaler Zugriff** — Server hört nur auf `127.0.0.1` (localhost)
+- ✅ **Private Repo** — Credentials nicht in Git
+
+---
 
 ## 📝 Lizenz
 
 MIT License - Frei für private und kommerzielle Nutzung
-
-## 🤝 Mitwirken
-
-Issues und Pull Requests willkommen!
-
----
-
-**Erstellt mit ❤️ für die Bambu Lab Community**
