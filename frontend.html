@@ -543,12 +543,14 @@
                             // Check if plate has been cleared
                             const plateCleared = data.awaiting_plate_clear === false;
                             
+                            console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${data.awaiting_plate_clear}`);
+                            
                             if (data.state === 'RUNNING') {
                                 status = 'printing';
                             } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
                                 // Only show error if temperatures are still active (not just stuck in FAILED state)
                                 status = 'error';
-                            } else if (data.progress >= 100) {
+                            } else if (data.progress >= 100 || data.state === 'FINISH') {
                                 status = 'complete';
                             }
                             
