@@ -113,19 +113,19 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         
         # Handle printer status endpoint specially
         if path == '/api/printers':
-            url = f"{API_URL}/printers"
+            url = f"{API_URL}/printers/"  # Add trailing slash!
         elif path.startswith('/api/') and 'clear-plate' in path:
             # Extract printer ID from /api/{id}/clear-plate
             parts = path.split('/')  # ['', 'api', '2', 'clear-plate']
             if len(parts) >= 4:
                 printer_id = parts[2]
-                url = f"{API_URL}/printers/{printer_id}/clear-plate"
+                url = f"{API_URL}/printers/{printer_id}/clear-plate/"  # Add trailing slash!
             else:
                 raise Exception(f"Invalid path format: {path}")
         else:
             # Default: forward as-is (but strip /api/ prefix)
             if path.startswith('/api/'):
-                url = f"{API_URL}{path[4:]}"  # Remove '/api' prefix
+                url = f"{API_URL}{path[4:]}/"  # Remove '/api' prefix and add trailing slash
             else:
                 url = f"{API_URL}{path}"
         
