@@ -33,24 +33,74 @@ if 'BAMBUDY_API_URL' not in os.environ and Path('.env').exists():
 # Configuration - ONLY accessible to this server
 API_URL = os.getenv('BAMBUDY_API_URL', 'https://DEINE-API-URL.de/api/v1')
 API_KEY = os.getenv('BAMBUDY_API_KEY', '')
+AUTH_USERNAME = os.getenv('BAMBUDY_AUTH_USERNAME', '')
+AUTH_PASSWORD = os.getenv('BAMBUDY_AUTH_PASSWORD', '')
 
-if not API_KEY:
-    print("❌ ERROR: BAMBUDY_API_KEY not found in .env file!")
-    sys.exit(1)
+# JWT token (loaded at startup via login)
+JWT_TOKEN = None
 
-print(f"✅ BamBuddy Proxy Server starting...")
-print(f"   API URL: {API_URL}")
-print(f"   API Key: {'*' * 20}{API_KEY[-4:]}")
-print(f"   Listening on http://localhost:8080")
-print()
+
+def do_login():
+    """Login to Bambu API and store JWT token."""
+    global JWT_TOKEN
+    
+    if not AUTH_USERNAME or not AUTH_PASSWORD:
+        print("⚠️  No credentials in .env — using X-API-Key auth")
+        return True
+    
+    url = f"{API_URL}/auth/login"
+    payload = json.dumps({"username": AUTH_USERNAME, "password": AUTH_PASSWORD}).encode()
+    
+    req = urllib.request.Request(url, data=payload, method='POST')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Accept', 'application/json')
+    
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode())
+            JWT_TOKEN = data.get('access_token', '')
+            if JWT_TOKEN:
+                print(f"✅ Logged in successfully (JWT token obtained)")
+                return True
+            else:
+                print(f"⚠️  Login returned no access_token")
+                return False
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode() if e.fp else ''
+        print(f"❌ Login failed (HTTP {e.code}): {error_body}")
+        return False
+    except Exception as e:
+        print(f"❌ Login error: {e}")
+        return False
+
 
 # Simple HTTP client using urllib (no external dependencies)
 import urllib.request
 import urllib.error
 
+# Try login at startup if credentials provided
+if AUTH_USERNAME and AUTH_PASSWORD:
+    do_login()
+
 
 class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     """Handles API proxy requests from the frontend."""
+
+    def get_auth_headers(self):
+        """Return appropriate auth headers (JWT or X-API-Key)."""
+        headers = {'Accept': 'application/json'}
+        
+        if JWT_TOKEN:
+            # Use Bearer token (preferred)
+            headers['Authorization'] = f'Bearer {JWT_TOKEN}'
+        elif API_KEY.startswith('eyJ'):
+            # Legacy JWT in .env
+            headers['Authorization'] = f'Bearer {API_KEY}'
+        else:
+            # Fallback to X-API-Key
+            headers['X-API-Key'] = API_KEY
+        
+        return headers
 
     def do_GET(self):
         """Handle GET requests - serve static files or fetch printer status."""
@@ -64,7 +114,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         if self.path.startswith('/api/'):
             try:
                 response = self.proxy_request(self.path)
-                if response:
+                if response is not None:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/json')
                     self.end_headers()
@@ -132,12 +182,9 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         print(f"📡 Proxying to: {url}")
         
         req = urllib.request.Request(url)
-        # Try X-API-Key first, fallback to Bearer token
-        if API_KEY.startswith('eyJ'):  # JWT token from login
-            req.add_header('Authorization', f'Bearer {API_KEY}')
-        else:
-            req.add_header('X-API-Key', API_KEY)
-        req.add_header('Accept', 'application/json')
+        headers = self.get_auth_headers()
+        for k, v in headers.items():
+            req.add_header(k, v)
         
         try:
             with urllib.request.urlopen(req, timeout=10) as response:
@@ -152,9 +199,10 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         url = f"{API_URL}{path}"
         
         req = urllib.request.Request(url, data=body.encode(), method='POST')
-        req.add_header('X-API-Key', API_KEY)
+        headers = self.get_auth_headers()
+        for k, v in headers.items():
+            req.add_header(k, v)
         req.add_header('Content-Type', 'application/json')
-        req.add_header('Accept', 'application/json')
         
         try:
             with urllib.request.urlopen(req, timeout=10) as response:
