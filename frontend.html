@@ -676,10 +676,19 @@
 
         // Initialisierung
         document.addEventListener('DOMContentLoaded', () => {
-            // Ersten Poll sofort starten
+            console.log('🚀 Initializing Bambuddy Touch...');
+            
+            // Load smart plugs first
+            loadSmartPlugs().then(() => {
+                console.log('✅ Smart plugs loaded');
+            }).catch(err => {
+                console.error('❌ Error loading smart plugs:', err);
+            });
+            
+            // Start polling printer status
             pollPrinterStatus();
             
-            // Regelmäßig aktualisieren (alle 10 Sekunden)
+            // Refresh every 10 seconds
             setInterval(pollPrinterStatus, 10000);
         });
 
