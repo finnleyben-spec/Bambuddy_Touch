@@ -15,6 +15,7 @@ else
     echo ""
     echo "📦 Repository wird geklont..."
     rm -rf "$TARGET_DIR" 2>/dev/null || true
+    mkdir -p /home/pi 2>/dev/null || true
     cd /home/pi && git clone https://github.com/finnleyben-spec/Bambuddy_Touch.git 2>&1 | tail -3
 fi
 
