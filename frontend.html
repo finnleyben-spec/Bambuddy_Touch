@@ -845,6 +845,17 @@
                     // Reload smart plug data to get updated state
                     await loadSmartPlugs();
                     
+                    // Immediately refresh printer status from API
+                    try {
+                        const statusResponse = await fetch(`${config.apiUrl}/printers/${printerId}/status`);
+                        if (statusResponse.ok) {
+                            const statusData = await statusResponse.json();
+                            updatePrinterStatus(printerId, statusData.state || 'idle', statusData.plateCleared);
+                        }
+                    } catch (e) {
+                        console.warn('Could not refresh printer status after power toggle:', e);
+                    }
+                    
                     console.log(`Power ${action} sent successfully for printer ${printerId}`);
                 } else {
                     throw new Error('API-Fehler');
