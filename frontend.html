@@ -248,16 +248,20 @@
 
         /* Dimmed state when power is off */
         .printer-card.power-off {
-            opacity: 0.5;
-            filter: grayscale(0.7);
+            opacity: 0.6;
         }
 
-        /* Keep power controls fully visible even when card is dimmed */
+        /* Keep power controls fully visible and colorful even when card is dimmed */
         .printer-card.power-off .power-controls {
             pointer-events: auto !important;
             filter: none !important;
             opacity: 1 !important;
             transform: none !important;
+        }
+
+        /* Dim everything else except power controls */
+        .printer-card.power-off > *:not(.power-controls) {
+            filter: grayscale(0.6);
         }
 
         .printer-card.power-off .clear-plate-btn,
