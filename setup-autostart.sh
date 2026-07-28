@@ -5,16 +5,20 @@ set -e
 echo "🚀 Bambuddy Touch Autostart Setup"
 echo "=================================="
 
-# 1. Repository klonen (falls nicht vorhanden)
-if [ ! -d "/home/pi/Bambuddy_Touch" ]; then
+TARGET_DIR="/home/pi/Bambuddy_Touch"
+
+# 1. Repository aktualisieren oder klonen
+if [ -d "$TARGET_DIR/.git" ]; then
+    echo "✅ Verzeichnis existiert, aktualisiere..."
+    cd "$TARGET_DIR" && git pull origin master 2>/dev/null || true
+else
     echo ""
     echo "📦 Repository wird geklont..."
-    git clone https://github.com/finnleyben-spec/Bambuddy_Touch.git /home/pi/Bambuddy_Touch
-else
-    echo "✅ Bambuddy_Touch Verzeichnis existiert bereits"
+    rm -rf "$TARGET_DIR" 2>/dev/null || true
+    cd /home/pi && git clone https://github.com/finnleyben-spec/Bambuddy_Touch.git 2>&1 | tail -3
 fi
 
-cd /home/pi/Bambuddy_Touch
+cd "$TARGET_DIR"
 
 # 2. .env prüfen
 if [ ! -f ".env" ]; then
