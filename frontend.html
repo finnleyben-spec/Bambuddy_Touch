@@ -168,7 +168,7 @@
             box-shadow: 0 0 8px rgba(72, 187, 120, 0.6);
         }
 
-        /* Power Control Buttons */
+        /* Power Control - Single Toggle Button */
         .power-controls {
             display: flex;
             gap: 8px;
@@ -177,70 +177,83 @@
             border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .power-btn {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
+        .power-toggle-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .power-btn-off {
-            background: rgba(245, 101, 101, 0.1);
-            color: #fc8181;
-            border: 1px solid rgba(245, 101, 101, 0.2);
-        }
-
-        .power-btn-off:hover {
-            background: rgba(245, 101, 101, 0.2);
-            border-color: rgba(245, 101, 101, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .power-btn-on {
-            background: rgba(72, 187, 120, 0.1);
+        .power-toggle-btn.on {
+            background: rgba(72, 187, 120, 0.15);
             color: #68d391;
-            border: 1px solid rgba(72, 187, 120, 0.2);
+            border: 1px solid rgba(72, 187, 120, 0.3);
         }
 
-        .power-btn-on:hover {
-            background: rgba(72, 187, 120, 0.2);
-            border-color: rgba(72, 187, 120, 0.4);
+        .power-toggle-btn.on:hover {
+            background: rgba(72, 187, 120, 0.25);
+            border-color: rgba(72, 187, 120, 0.5);
             transform: translateY(-1px);
         }
 
-        .power-btn-toggle {
-            background: rgba(237, 137, 54, 0.1);
-            color: #f6ad55;
-            border: 1px solid rgba(237, 137, 54, 0.2);
+        .power-toggle-btn.off {
+            background: rgba(245, 101, 101, 0.15);
+            color: #fc8181;
+            border: 1px solid rgba(245, 101, 101, 0.3);
         }
 
-        .power-btn-toggle:hover {
-            background: rgba(237, 137, 54, 0.2);
-            border-color: rgba(237, 137, 54, 0.4);
+        .power-toggle-btn.off:hover {
+            background: rgba(245, 101, 101, 0.25);
+            border-color: rgba(245, 101, 101, 0.5);
             transform: translateY(-1px);
         }
 
-        .power-btn:disabled {
+        .power-toggle-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        .power-status {
-            font-size: 11px;
+        .power-status-text {
+            font-size: 12px;
             color: #a0aec0;
             text-align: center;
-            margin-top: 6px;
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        .power-status.on { color: #68d391; }
-        .power-status.off { color: #fc8181; }
+        .power-status-text.on { 
+            color: #68d391; 
+            background: rgba(72, 187, 120, 0.08);
+        }
+
+        .power-status-text.off { 
+            color: #fc8181; 
+            background: rgba(245, 101, 101, 0.08);
+        }
+
+        /* Dimmed state when power is off */
+        .printer-card.power-off {
+            opacity: 0.5;
+            filter: grayscale(0.7);
+            pointer-events: none;
+        }
+
+        .power-status-icon {
+            font-size: 16px;
+        }
 
         .error-icon { 
             font-size: 32px; 
@@ -361,11 +374,9 @@
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-2">Bereit zum Drucken</div>
                 <div class="power-controls" id="power-controls-2">
-                    <button class="power-btn power-btn-off" onclick="controlPower(2, 'off')">⏻ Aus</button>
-                    <button class="power-btn power-btn-on" onclick="controlPower(2, 'on')">⏻ An</button>
-                    <button class="power-btn power-btn-toggle" onclick="controlPower(2, 'toggle')">⇄ Toggle</button>
+                    <button class="power-toggle-btn on" id="power-btn-2" onclick="confirmPowerToggle(2)">⏻ An / Aus</button>
                 </div>
-                <div class="power-status" id="power-status-2">Lädt Steckdose...</div>
+                <div class="power-status-text on" id="power-status-2">✓ Steckdose an</div>
             </div>
 
             <!-- Printer 2: X1C #2 (ID: 1) -->
@@ -380,11 +391,9 @@
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-1">Bereit zum Drucken</div>
                 <div class="power-controls" id="power-controls-1">
-                    <button class="power-btn power-btn-off" onclick="controlPower(1, 'off')">⏻ Aus</button>
-                    <button class="power-btn power-btn-on" onclick="controlPower(1, 'on')">⏻ An</button>
-                    <button class="power-btn power-btn-toggle" onclick="controlPower(1, 'toggle')">⇄ Toggle</button>
+                    <button class="power-toggle-btn on" id="power-btn-1" onclick="confirmPowerToggle(1)">⏻ An / Aus</button>
                 </div>
-                <div class="power-status" id="power-status-1">Lädt Steckdose...</div>
+                <div class="power-status-text on" id="power-status-1">✓ Steckdose an</div>
             </div>
 
             <!-- Printer 3: X1C #3 (ID: 3) -->
@@ -399,11 +408,9 @@
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-3">Bereit zum Drucken</div>
                 <div class="power-controls" id="power-controls-3">
-                    <button class="power-btn power-btn-off" onclick="controlPower(3, 'off')">⏻ Aus</button>
-                    <button class="power-btn power-btn-on" onclick="controlPower(3, 'on')">⏻ An</button>
-                    <button class="power-btn power-btn-toggle" onclick="controlPower(3, 'toggle')">⇄ Toggle</button>
+                    <button class="power-toggle-btn on" id="power-btn-3" onclick="confirmPowerToggle(3)">⏻ An / Aus</button>
                 </div>
-                <div class="power-status" id="power-status-3">Lädt Steckdose...</div>
+                <div class="power-status-text on" id="power-status-3">✓ Steckdose an</div>
             </div>
 
             <!-- Printer 4: H2D (ID: 4) -->
@@ -418,11 +425,9 @@
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-4">Bereit zum Drucken</div>
                 <div class="power-controls" id="power-controls-4">
-                    <button class="power-btn power-btn-off" onclick="controlPower(4, 'off')">⏻ Aus</button>
-                    <button class="power-btn power-btn-on" onclick="controlPower(4, 'on')">⏻ An</button>
-                    <button class="power-btn power-btn-toggle" onclick="controlPower(4, 'toggle')">⇄ Toggle</button>
+                    <button class="power-toggle-btn on" id="power-btn-4" onclick="confirmPowerToggle(4)">⏻ An / Aus</button>
                 </div>
-                <div class="power-status" id="power-status-4">Lädt Steckdose...</div>
+                <div class="power-status-text on" id="power-status-4">✓ Steckdose an</div>
             </div>
         </div>
     </div>
@@ -436,6 +441,19 @@
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
                 <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">✓ Bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Power Toggle Confirmation Modal -->
+    <div class="modal-overlay" id="powerModal">
+        <div class="modal">
+            <div class="modal-icon">⚡</div>
+            <h2 class="modal-title" id="powerModalTitle">Steckdose?</h2>
+            <p class="modal-text" id="powerModalText">Möchtest du die Steckdose umschalten?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closePowerModal()">Abbrechen</button>
+                <button class="btn-confirm" onclick="confirmPowerToggleAction()">✓ Bestätigen</button>
             </div>
         </div>
     </div>
@@ -712,7 +730,7 @@
                         const data = await response.json();
                         smartPlugData[id] = data;
                         
-                        // Update UI based on whether plug exists
+                        // Update UI based on whether plug exists and its state
                         updatePowerUI(id, data);
                     } else {
                         console.log(`No smart plug for printer ${id}`);
@@ -727,24 +745,74 @@
         }
         
         function updatePowerUI(printerId, data) {
-            const controls = document.getElementById(`power-controls-${printerId}`);
+            const card = document.querySelector(`[data-printer-id="${printerId}"]`);
+            const btn = document.getElementById(`power-btn-${printerId}`);
             const statusEl = document.getElementById(`power-status-${printerId}`);
             
             if (!data || !data.id) {
                 // No smart plug found
-                controls.style.display = 'none';
-                statusEl.textContent = 'Keine Steckdose konfiguriert';
                 return;
             }
             
-            // Smart plug exists, show controls
-            controls.style.display = 'flex';
-            statusEl.textContent = `Steckdose: ${data.name || 'Smart Plug'}`;
+            const isOn = data.last_state === 'ON';
+            
+            // Update button text and class
+            if (btn) {
+                btn.textContent = isOn ? '⏻ An' : '⏻ Aus';
+                btn.className = `power-toggle-btn ${isOn ? 'on' : 'off'}`;
+            }
+            
+            // Update status text
+            if (statusEl) {
+                statusEl.textContent = isOn ? '✓ Steckdose an' : '✗ Steckdose aus';
+                statusEl.className = `power-status-text ${isOn ? 'on' : 'off'}`;
+            }
+            
+            // Dim card if power is off
+            if (card) {
+                if (!isOn) {
+                    card.classList.add('power-off');
+                    const statusText = document.getElementById(`status-text-${printerId}`);
+                    if (statusText) statusText.textContent = '⚡ Steckdose aus';
+                } else {
+                    card.classList.remove('power-off');
+                }
+            }
         }
         
-        async function controlPower(printerId, action) {
-            const btn = event.target;
-            const originalText = btn.textContent;
+        // Confirmation modal for power toggle
+        let pendingPowerAction = null;
+        
+        function confirmPowerToggle(printerId) {
+            const data = smartPlugData[printerId];
+            if (!data || !data.id) return;
+            
+            const isOn = data.last_state === 'ON';
+            const action = isOn ? 'AUS' : 'AN';
+            const printerName = document.querySelector(`[data-printer-id="${printerId}"] .printer-name`).textContent;
+            
+            // Update modal text
+            document.getElementById('powerModalTitle').textContent = `Steckdose ${action}?`;
+            document.getElementById('powerModalText').innerHTML = 
+                `Möchtest du die Steckdose von <strong>${printerName}</strong> ${isOn ? 'ausschalten' : 'einschalten'}?`;
+            
+            // Store action for confirmation
+            pendingPowerAction = { printerId, action: isOn ? 'off' : 'on' };
+            
+            // Show modal
+            document.getElementById('powerModal').classList.add('active');
+        }
+        
+        function closePowerModal() {
+            document.getElementById('powerModal').classList.remove('active');
+            pendingPowerAction = null;
+        }
+        
+        async function confirmPowerToggleAction() {
+            if (!pendingPowerAction) return;
+            
+            const { printerId, action } = pendingPowerAction;
+            const btn = document.getElementById(`power-btn-${printerId}`);
             
             // Disable button during request
             btn.disabled = true;
@@ -758,12 +826,8 @@
                 });
                 
                 if (response.ok) {
-                    // Show success feedback
-                    btn.textContent = '✓';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }, 1000);
+                    // Reload smart plug data to get updated state
+                    await loadSmartPlugs();
                     
                     console.log(`Power ${action} sent successfully for printer ${printerId}`);
                 } else {
@@ -773,11 +837,20 @@
                 console.error(`Error controlling power for printer ${printerId}:`, error);
                 btn.textContent = '✗';
                 setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
+                    if (btn) {
+                        const data = smartPlugData[printerId];
+                        if (data && data.id) {
+                            updatePowerUI(printerId, data);
+                        } else {
+                            btn.textContent = '⏻ An / Aus';
+                            btn.disabled = false;
+                        }
+                    }
                 }, 2000);
                 
                 alert(`Fehler beim Steuern der Steckdose: ${error.message}`);
+            } finally {
+                closePowerModal();
             }
         }
         
