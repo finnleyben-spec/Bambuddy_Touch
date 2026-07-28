@@ -783,5 +783,21 @@
         
         // Load smart plugs on page load
         document.addEventListener('DOMContentLoaded', () => {
-            loadSmartPlugs();
+            console.log('🚀 Initializing Bambuddy Touch...');
+            
+            // Load smart plugs first
+            loadSmartPlugs().then(() => {
+                console.log('✅ Smart plugs loaded');
+            }).catch(err => {
+                console.error('❌ Error loading smart plugs:', err);
+            });
+            
+            // Start polling printer status
+            pollPrinterStatus();
+            
+            // Refresh every 10 seconds
+            setInterval(pollPrinterStatus, 10000);
         });
+    </script>
+</body>
+</html>
