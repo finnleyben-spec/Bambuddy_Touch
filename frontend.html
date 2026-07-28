@@ -609,6 +609,17 @@
                         document.getElementById('successAnimation').classList.remove('active');
                     }, 2000);
 
+                    // Immediately refresh printer status from API
+                    try {
+                        const statusResponse = await fetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
+                        if (statusResponse.ok) {
+                            const statusData = await statusResponse.json();
+                            updatePrinterStatus(currentPrinterId, statusData.state || 'idle', statusData.plateCleared);
+                        }
+                    } catch (e) {
+                        console.warn('Could not refresh printer status after clear plate:', e);
+                    }
+
                     // Status auf idle setzen
                     updatePrinterStatus(currentPrinterId, 'idle');
                 } else {
