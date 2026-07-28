@@ -168,6 +168,80 @@
             box-shadow: 0 0 8px rgba(72, 187, 120, 0.6);
         }
 
+        /* Power Control Buttons */
+        .power-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .power-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .power-btn-off {
+            background: rgba(245, 101, 101, 0.1);
+            color: #fc8181;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+
+        .power-btn-off:hover {
+            background: rgba(245, 101, 101, 0.2);
+            border-color: rgba(245, 101, 101, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .power-btn-on {
+            background: rgba(72, 187, 120, 0.1);
+            color: #68d391;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+
+        .power-btn-on:hover {
+            background: rgba(72, 187, 120, 0.2);
+            border-color: rgba(72, 187, 120, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .power-btn-toggle {
+            background: rgba(237, 137, 54, 0.1);
+            color: #f6ad55;
+            border: 1px solid rgba(237, 137, 54, 0.2);
+        }
+
+        .power-btn-toggle:hover {
+            background: rgba(237, 137, 54, 0.2);
+            border-color: rgba(237, 137, 54, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .power-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .power-status {
+            font-size: 11px;
+            color: #a0aec0;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        .power-status.on { color: #68d391; }
+        .power-status.off { color: #fc8181; }
+
         .error-icon { 
             font-size: 32px; 
             text-align: center; 
@@ -271,7 +345,7 @@
         <header>
             <h1>🖨️ Bambuddy Control</h1>
             <p class="subtitle">Clear Plate Management</p>
-            <p style="font-size: 11px; color: #718096; margin-top: 8px;" id="versionDisplay">v2.2.0</p>
+            <p style="font-size: 11px; color: #718096; margin-top: 8px;" id="versionDisplay">v2.3.0</p>
         </header>
 
         <div class="printers-grid" id="printersGrid">
@@ -286,6 +360,12 @@
                 </div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-2">Bereit zum Drucken</div>
+                <div class="power-controls" id="power-controls-2">
+                    <button class="power-btn power-btn-off" onclick="controlPower(2, 'off')">⏻ Aus</button>
+                    <button class="power-btn power-btn-on" onclick="controlPower(2, 'on')">⏻ An</button>
+                    <button class="power-btn power-btn-toggle" onclick="controlPower(2, 'toggle')">⇄ Toggle</button>
+                </div>
+                <div class="power-status" id="power-status-2">Lädt Steckdose...</div>
             </div>
 
             <!-- Printer 2: X1C #2 (ID: 1) -->
@@ -299,6 +379,12 @@
                 </div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-1">Bereit zum Drucken</div>
+                <div class="power-controls" id="power-controls-1">
+                    <button class="power-btn power-btn-off" onclick="controlPower(1, 'off')">⏻ Aus</button>
+                    <button class="power-btn power-btn-on" onclick="controlPower(1, 'on')">⏻ An</button>
+                    <button class="power-btn power-btn-toggle" onclick="controlPower(1, 'toggle')">⇄ Toggle</button>
+                </div>
+                <div class="power-status" id="power-status-1">Lädt Steckdose...</div>
             </div>
 
             <!-- Printer 3: X1C #3 (ID: 3) -->
@@ -312,6 +398,12 @@
                 </div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-3">Bereit zum Drucken</div>
+                <div class="power-controls" id="power-controls-3">
+                    <button class="power-btn power-btn-off" onclick="controlPower(3, 'off')">⏻ Aus</button>
+                    <button class="power-btn power-btn-on" onclick="controlPower(3, 'on')">⏻ An</button>
+                    <button class="power-btn power-btn-toggle" onclick="controlPower(3, 'toggle')">⇄ Toggle</button>
+                </div>
+                <div class="power-status" id="power-status-3">Lädt Steckdose...</div>
             </div>
 
             <!-- Printer 4: H2D (ID: 4) -->
@@ -325,6 +417,12 @@
                 </div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">🧹 Clear Plate</button>
                 <div class="status-text" id="status-text-4">Bereit zum Drucken</div>
+                <div class="power-controls" id="power-controls-4">
+                    <button class="power-btn power-btn-off" onclick="controlPower(4, 'off')">⏻ Aus</button>
+                    <button class="power-btn power-btn-on" onclick="controlPower(4, 'on')">⏻ An</button>
+                    <button class="power-btn power-btn-toggle" onclick="controlPower(4, 'toggle')">⇄ Toggle</button>
+                </div>
+                <div class="power-status" id="power-status-4">Lädt Steckdose...</div>
             </div>
         </div>
     </div>
@@ -348,7 +446,7 @@
     </div>
 
     <script>
-        const config = { apiUrl: 'http://localhost:8080/api' };
+        const config = { apiUrl: '/api' };
         
         const printerStates = {
             1: { status: 'idle', name: 'X1 Carbon #2' },
@@ -591,6 +689,90 @@
                 closeModal();
             }
         });
-    </script>
-</body>
-</html>
+
+        // Power Control Functions
+        let smartPlugData = {}; // Store smart plug data per printer
+        
+        async function loadSmartPlugs() {
+            const printerIds = [1, 2, 3, 4];
+            
+            for (const id of printerIds) {
+                try {
+                    const response = await fetch(`${config.apiUrl}/printers/${id}/smart-plug`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        smartPlugData[id] = data;
+                        
+                        // Update UI based on whether plug exists
+                        updatePowerUI(id, data);
+                    } else {
+                        console.log(`No smart plug for printer ${id}`);
+                        document.getElementById(`power-status-${id}`).textContent = 'Keine Steckdose';
+                        document.getElementById(`power-controls-${id}`).style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error(`Error loading smart plug for printer ${id}:`, err);
+                    document.getElementById(`power-status-${id}`).textContent = 'Fehler beim Laden';
+                }
+            }
+        }
+        
+        function updatePowerUI(printerId, data) {
+            const controls = document.getElementById(`power-controls-${printerId}`);
+            const statusEl = document.getElementById(`power-status-${printerId}`);
+            
+            if (!data || !data.id) {
+                // No smart plug found
+                controls.style.display = 'none';
+                statusEl.textContent = 'Keine Steckdose konfiguriert';
+                return;
+            }
+            
+            // Smart plug exists, show controls
+            controls.style.display = 'flex';
+            statusEl.textContent = `Steckdose: ${data.name || 'Smart Plug'}`;
+        }
+        
+        async function controlPower(printerId, action) {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            
+            // Disable button during request
+            btn.disabled = true;
+            btn.textContent = '⏳ ...';
+            
+            try {
+                const response = await fetch(`${config.apiUrl}/printers/${printerId}/smart-plug/control`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+                
+                if (response.ok) {
+                    // Show success feedback
+                    btn.textContent = '✓';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 1000);
+                    
+                    console.log(`Power ${action} sent successfully for printer ${printerId}`);
+                } else {
+                    throw new Error('API-Fehler');
+                }
+            } catch (error) {
+                console.error(`Error controlling power for printer ${printerId}:`, error);
+                btn.textContent = '✗';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+                
+                alert(`Fehler beim Steuern der Steckdose: ${error.message}`);
+            }
+        }
+        
+        // Load smart plugs on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSmartPlugs();
+        });

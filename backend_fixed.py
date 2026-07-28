@@ -3,7 +3,7 @@
 BamBuddy Clear Plate Proxy Server - FIXED VERSION
 Sicherer lokaler Server, der die API-Keys vor dem Browser verbirgt.
 
-Start: python3 backend.py
+Start: python3 backend_fixed.py
 Stop:  Ctrl+C oder kill den Prozess
 """
 
@@ -109,40 +109,6 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             self.serve_file('frontend.html', 'text/html')
             return
         
-        # Smart plug control: /api/printers/{id}/smart-plug -> get smart plug for printer
-        if self.path.startswith('/api/printers/') and self.path.endswith('/smart-plug'):
-            parts = self.path.split('/')  # ['', 'api', 'printers', '1', 'smart-plug']
-            if len(parts) >= 5:
-                printer_id = parts[3]
-                url = f"{API_URL}/smart-plugs/by-printer/{printer_id}"
-                print(f"📡 Proxying GET to: {url}")
-                
-                req = urllib.request.Request(url)
-                headers = self.get_auth_headers()
-                for k, v in headers.items():
-                    req.add_header(k, v)
-                
-                try:
-                    with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
-                        data = json.loads(response.read().decode())
-                        self.send_response(200)
-                        self.send_header('Content-Type', 'application/json')
-                        self.send_header('Access-Control-Allow-Origin', '*')
-                        self.end_headers()
-                        self.wfile.write(json.dumps(data).encode())
-                        return
-                except urllib.error.HTTPError as e:
-                    error_body = e.read().decode() if e.fp else ''
-                    print(f"❌ API Error: {e.code} - {error_body}")
-                    self.send_response(e.code)
-                    self.send_header('Content-Type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"error": error_body}).encode())
-                    return
-            else:
-                self.send_error(400, "Invalid path format")
-                return
-        
         # API proxy: /api/printers -> forward to real API
         if self.path.startswith('/api/'):
             try:
@@ -174,65 +140,6 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         # Read request body
         content_length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(content_length) if content_length > 0 else b''
-        
-        # Smart plug control: /api/printers/{id}/smart-plug/control -> POST to control endpoint
-        if 'smart-plug' in self.path and 'control' in self.path:
-            parts = self.path.split('/')  # ['', 'api', 'printers', '1', 'smart-plug', 'control']
-            if len(parts) >= 6:
-                printer_id = parts[3]
-                
-                # First get the smart plug ID for this printer
-                try:
-                    url = f"{API_URL}/smart-plugs/by-printer/{printer_id}"
-                    req = urllib.request.Request(url)
-                    headers = self.get_auth_headers()
-                    for k, v in headers.items():
-                        req.add_header(k, v)
-                    
-                    with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
-                        smart_plug_data = json.loads(response.read().decode())
-                        
-                        if not smart_plug_data or 'id' not in smart_plug_data:
-                            self.send_response(404)
-                            self.send_header('Content-Type', 'application/json')
-                            self.end_headers()
-                            self.wfile.write(json.dumps({"error": "No smart plug found for this printer"}).encode())
-                            return
-                        
-                        plug_id = smart_plug_data['id']
-                        
-                        # Now control the plug
-                        control_url = f"{API_URL}/smart-plugs/{plug_id}/control"
-                        print(f"📡 Proxying POST to: {control_url}")
-                        
-                        req2 = urllib.request.Request(control_url, data=body, method='POST')
-                        headers2 = self.get_auth_headers()
-                        for k, v in headers2.items():
-                            req2.add_header(k, v)
-                        req2.add_header('Content-Type', 'application/json')
-                        
-                        with urllib.request.urlopen(req2, timeout=10, context=ssl._create_unverified_context()) as response:
-                            data = json.loads(response.read().decode())
-                            self.send_response(200)
-                            self.send_header('Content-Type', 'application/json')
-                            self.end_headers()
-                            self.wfile.write(json.dumps(data).encode())
-                            return
-                except urllib.error.HTTPError as e:
-                    error_body = e.read().decode() if e.fp else ''
-                    print(f"❌ API Error: {e.code} - {error_body}")
-                    self.send_response(e.code)
-                    self.send_header('Content-Type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"error": error_body}).encode())
-                    return
-                except Exception as e:
-                    print(f"❌ Error: {e}")
-                    self.send_response(500)
-                    self.send_header('Content-Type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"error": str(e)}).encode())
-                    return
         
         # Proxy the request
         try:
