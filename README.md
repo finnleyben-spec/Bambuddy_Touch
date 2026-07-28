@@ -1,6 +1,15 @@
-# 🖨️ Bambuddy Clear Plate Controller
+# 🖨️ Bambuddy Touch — Smart Printer Dashboard
 
 Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimiert für Raspberry Pi mit Touchscreen.
+
+## ✨ Features
+
+- **📊 Echtzeit-Status** aller Drucker auf einer Übersicht
+- **⏻ Smart Plug Power Control** — Drucker ein/aus schalten über smarte Steckdosen
+- **🧹 Clear Plate** — Druckplatte zurücksetzen per Knopfdruck
+- **✅ Bestätigungsdialoge** — Verhindert versehentliche Aktionen
+- **🎨 Dark Glassmorphism UI** — Modernes, dunkles Design mit Glasmorphismus-Effekten
+- **📱 Touch-optimiert** — Perfekt für Raspberry Pi Touchscreens
 
 ## ⚠️ WICHTIG: Private Repo
 
@@ -111,13 +120,13 @@ chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
 
 ### Einzeiler (empfohlen)
 ```bash
-cd ~/Bambuddy_Touch && git pull origin main && pkill python3; sleep 1; cd /home/pi/bambuddy-clearplate && python3 backend.py &
+cd ~/Bambuddy_Touch && git pull origin master && pkill python3; sleep 1; cd /home/pi/bambuddy-clearplate && python3 backend.py &
 ```
 
 ### Manuell
 ```bash
 # 1. Update holen:
-cd ~/Bambuddy_Touch && git pull origin main
+cd ~/Bambuddy_Touch && git pull origin master
 
 # 2. Server stoppen:
 pkill -f "python3 backend.py"
@@ -135,7 +144,7 @@ cd /home/pi/bambuddy-clearplate && python3 backend.py &
 | Problem | Lösung |
 |---------|--------|
 | Server startet nicht | `sudo journalctl -u bambuddy-clearplate -n 50` prüfen |
-| Port 8080 belegt | `netstat -tlnp \ | grep 8080` — anderen Port in `backend.py` Zeile 168 anpassen |
+| Port 8080 belegt | `netstat -tlnp \| grep 8080` — anderen Port in `backend.py` Zeile 168 anpassen |
 | "Permission denied" | `sudo chmod 644 /etc/systemd/system/bambuddy-clearplate.service` |
 | API-Fehler | Prüfe ob `.env` existiert: `cat .env` — sollte `BAMBUDY_API_KEY=...` enthalten |
 
