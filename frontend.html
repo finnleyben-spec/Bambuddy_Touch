@@ -179,42 +179,44 @@
 
         .power-toggle-btn {
             width: 100%;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
+        /* When printer is ON - show red "Aus" button (subtle) */
         .power-toggle-btn.on {
+            background: rgba(245, 101, 101, 0.08);
+            color: #fc8181;
+            border: 1px solid rgba(245, 101, 101, 0.15);
+        }
+
+        .power-toggle-btn.on:hover {
+            background: rgba(245, 101, 101, 0.15);
+            border-color: rgba(245, 101, 101, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* When printer is OFF - show green "An" button (prominent) */
+        .power-toggle-btn.off {
             background: rgba(72, 187, 120, 0.15);
             color: #68d391;
             border: 1px solid rgba(72, 187, 120, 0.3);
         }
 
-        .power-toggle-btn.on:hover {
+        .power-toggle-btn.off:hover {
             background: rgba(72, 187, 120, 0.25);
             border-color: rgba(72, 187, 120, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .power-toggle-btn.off {
-            background: rgba(245, 101, 101, 0.15);
-            color: #fc8181;
-            border: 1px solid rgba(245, 101, 101, 0.3);
-        }
-
-        .power-toggle-btn.off:hover {
-            background: rgba(245, 101, 101, 0.25);
-            border-color: rgba(245, 101, 101, 0.5);
             transform: translateY(-1px);
         }
 
@@ -235,19 +237,28 @@
         }
 
         .power-status-text.on { 
-            color: #68d391; 
-            background: rgba(72, 187, 120, 0.08);
+            color: #fc8181; 
+            background: rgba(245, 101, 101, 0.06);
         }
 
         .power-status-text.off { 
-            color: #fc8181; 
-            background: rgba(245, 101, 101, 0.08);
+            color: #68d391; 
+            background: rgba(72, 187, 120, 0.08);
         }
 
         /* Dimmed state when power is off */
         .printer-card.power-off {
             opacity: 0.5;
             filter: grayscale(0.7);
+        }
+
+        /* Keep power controls clickable even when card is dimmed */
+        .printer-card.power-off .power-controls {
+            pointer-events: auto !important;
+        }
+
+        .printer-card.power-off .clear-plate-btn,
+        .printer-card.power-off .status-text {
             pointer-events: none;
         }
 
@@ -758,7 +769,7 @@
             
             // Update button text and class
             if (btn) {
-                btn.textContent = isOn ? '⏻ An' : '⏻ Aus';
+                btn.textContent = isOn ? '⏻ Aus' : '⏻ An';
                 btn.className = `power-toggle-btn ${isOn ? 'on' : 'off'}`;
             }
             
