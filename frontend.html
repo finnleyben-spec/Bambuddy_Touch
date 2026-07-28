@@ -252,9 +252,11 @@
             filter: grayscale(0.7);
         }
 
-        /* Keep power controls clickable even when card is dimmed */
+        /* Keep power controls fully visible even when card is dimmed */
         .printer-card.power-off .power-controls {
             pointer-events: auto !important;
+            filter: none !important;
+            opacity: 1 !important;
         }
 
         .printer-card.power-off .clear-plate-btn,
