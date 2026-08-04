@@ -10,6 +10,7 @@ Stop:  Ctrl+C oder kill den Prozess
 import os
 import sys
 import json
+import subprocess
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
@@ -103,6 +104,49 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         """Handle GET requests - serve static files or fetch printer status."""
+        
+        # Update endpoint: /api/update -> run git pull + restart service
+        if self.path == '/api/update':
+            try:
+                print("🔄 Starting update...")
+                result = subprocess.run(
+                    ['bash', '-c', 'cd ~/Bambuddy_Touch && git pull origin master'],
+                    capture_output=True, text=True, timeout=60
+                )
+                
+                if result.returncode != 0:
+                    error_msg = result.stderr or result.stdout
+                    print(f"❌ Git pull failed: {error_msg}")
+                    self.send_json_response(500, {"status": "error", "message": f"Git pull failed: {error_msg}"})
+                    return
+                
+                # Restart service (try without sudo first)
+                restart_result = subprocess.run(
+                    ['systemctl', 'restart', 'bambuddy-touch'],
+                    capture_output=True, text=True, timeout=10
+                )
+                
+                if restart_result.returncode != 0:
+                    # Try with sudo
+                    restart_result2 = subprocess.run(
+                        ['sudo', '-n', 'systemctl', 'restart', 'bambuddy-touch'],
+                        capture_output=True, text=True, timeout=10
+                    )
+                    if restart_result2.returncode != 0:
+                        error_msg = restart_result.stderr or restart_result2.stderr
+                        print(f"❌ Service restart failed: {error_msg}")
+                        self.send_json_response(500, {"status": "error", "message": f"Service restart failed: {error_msg}"})
+                        return
+                
+                print("✅ Update successful!")
+                self.send_json_response(200, {"status": "success", "message": "Update completed successfully"})
+            except subprocess.TimeoutExpired:
+                print("❌ Update timed out")
+                self.send_json_response(504, {"status": "error", "message": "Update timed out"})
+            except Exception as e:
+                print(f"❌ Update error: {e}")
+                self.send_json_response(500, {"status": "error", "message": str(e)})
+            return
         
         # Serve frontend HTML
         if self.path == '/' or self.path == '/frontend.html':
@@ -365,6 +409,16 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             self.wfile.write(content)
         except FileNotFoundError:
             self.send_error(404, "File not found")
+
+    def send_json_response(self, status_code, data):
+        """Send a JSON response."""
+        body = json.dumps(data).encode()
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-Length', len(body))
+        self.end_headers()
+        self.wfile.write(body)
 
     def log_message(self, format, *args):
         """Log requests to console."""

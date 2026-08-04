@@ -275,6 +275,93 @@
             font-size: 16px;
         }
 
+        /* Update Button */
+        .update-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            z-index: 100;
+        }
+
+        .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .update-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+        /* Update Modal */
+        .update-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .update-modal-overlay.active { display: flex; }
+
+        .update-modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .update-modal-icon { font-size: 48px; text-align: center; margin-bottom: 20px; }
+        .update-modal-title { font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 12px; color: #ffffff; }
+        .update-modal-text { color: #a0aec0; text-align: center; margin-bottom: 24px; line-height: 1.6; }
+
+        .update-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .update-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .update-status {
+            font-size: 14px;
+            color: #a0aec0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .update-result {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .update-result.success { background: rgba(72, 187, 120, 0.1); color: #68d391; border: 1px solid rgba(72, 187, 120, 0.2); }
+        .update-result.error { background: rgba(245, 101, 101, 0.1); color: #fc8181; border: 1px solid rgba(245, 101, 101, 0.2); }
+
+        .update-buttons { display: flex; gap: 12px; margin-top: 20px; }
+
         .error-icon { 
             font-size: 32px; 
             text-align: center; 
@@ -477,6 +564,31 @@
     <!-- Success Animation -->
     <div class="success-animation" id="successAnimation">
         <div class="success-icon">✓</div>
+    </div>
+
+    <!-- Update Button -->
+    <button class="update-btn" onclick="openUpdateModal()">🔄 Update</button>
+
+    <!-- Update Confirmation Modal -->
+    <div class="update-modal-overlay" id="updateModal">
+        <div class="update-modal">
+            <div class="update-modal-icon">🔄</div>
+            <h2 class="update-modal-title">System aktualisieren?</h2>
+            <p class="update-modal-text">Möchtest du das System auf die neueste Version updaten? Der Server wird kurz neu starten.</p>
+            
+            <div class="update-progress">
+                <div class="update-progress-bar" id="updateProgressBar"></div>
+            </div>
+            
+            <div class="update-status" id="updateStatus">Bereit...</div>
+            
+            <div id="updateResult"></div>
+            
+            <div class="update-buttons">
+                <button class="btn-cancel" onclick="closeUpdateModal()">Abbrechen</button>
+                <button class="btn-confirm" id="confirmUpdateBtn" onclick="executeUpdate()">✓ Update starten</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -908,6 +1020,69 @@
             
             // Refresh every 10 seconds
             setInterval(pollPrinterStatus, 10000);
+        });
+
+        // Update Modal Functions
+        function openUpdateModal() {
+            document.getElementById('updateModal').classList.add('active');
+            document.getElementById('updateProgressBar').style.width = '0%';
+            document.getElementById('updateStatus').textContent = 'Bereit...';
+            document.getElementById('updateResult').innerHTML = '';
+            document.getElementById('confirmUpdateBtn').disabled = false;
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('updateModal').classList.remove('active');
+        }
+
+        async function executeUpdate() {
+            const btn = document.getElementById('confirmUpdateBtn');
+            const progressBar = document.getElementById('updateProgressBar');
+            const statusEl = document.getElementById('updateStatus');
+            
+            btn.disabled = true;
+            progressBar.style.width = '20%';
+            statusEl.textContent = 'Update wird gestartet...';
+            
+            try {
+                // Step 1: Git pull
+                progressBar.style.width = '40%';
+                statusEl.textContent = 'Lade neueste Version herunter...';
+                
+                const response = await fetch('/api/update', { method: 'GET' });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    progressBar.style.width = '80%';
+                    statusEl.textContent = 'Update erfolgreich! Server wird neu gestartet...';
+                    
+                    // Show success message
+                    document.getElementById('updateResult').innerHTML = 
+                        '<div class="update-result success">✅ Update erfolgreich!</div>';
+                    
+                    // Reload page after 2 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Update fehlgeschlagen');
+                }
+            } catch (error) {
+                progressBar.style.width = '100%';
+                statusEl.textContent = 'Fehler beim Update';
+                
+                document.getElementById('updateResult').innerHTML = 
+                    `<div class="update-result error">❌ ${error.message}</div>`;
+                
+                btn.disabled = false;
+            }
+        }
+
+        // Close modal on outside click
+        document.getElementById('updateModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('updateModal')) {
+                closeUpdateModal();
+            }
         });
     </script>
 </body>
