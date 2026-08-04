@@ -621,10 +621,9 @@
         function updatePrinterStatus(printerId, status, plateCleared = false) {
             const card = document.querySelector(`[data-printer-id="${printerId}"]`);
             const badge = document.getElementById(`status-${printerId}`);
-            const statusText = document.getElementById(`status-text-${printerId}`);
-            let btn = card.querySelector('.clear-plate-btn, .reset-btn, .ready-to-print');
+            let btn = card?.querySelector('.clear-plate-btn, .reset-btn, .ready-to-print');
 
-            if (!card || !badge || !statusText) return;
+            if (!card || !badge) return;
 
             // Status aktualisieren
             printerStates[printerId].status = status;
@@ -632,9 +631,6 @@
             // Badge-Klasse anpassen
             badge.className = `status-badge status-${status}`;
             badge.textContent = status.toUpperCase();
-
-            // Status-Text aktualisieren
-            statusText.textContent = statusMessages[status] || 'Unbekannt';
 
             // Button-State anpassen
             if (status === 'printing') {
@@ -651,8 +647,6 @@
                 btn.textContent = '🔄 Reset';
                 btn.className = 'reset-btn';
                 btn.onclick = () => resetPrinter(printerId);
-                statusText.classList.add('error');
-                statusText.textContent = 'Fehler aufgetreten – Reset nötig';
             } else if (status === 'complete') {
                 card.classList.remove('disabled');
                 btn.disabled = false;
@@ -662,14 +656,12 @@
                     btn.className = 'ready-to-print';
                     btn.textContent = 'Ready To Print';
                     btn.onclick = null;
-                    statusText.textContent = 'Druck abgeschlossen – Bereit zum Drucken';
                 } else {
                     // Show Clear Plate button
                     btn.classList.add('blinking');
                     btn.className = 'clear-plate-btn blinking';
                     btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
                     btn.textContent = '🧹 Clear Plate';
-                    statusText.textContent = 'Druck abgeschlossen - Clear Plate wartet';
                 }
             } else {
                 // idle - check if plate has been cleared
@@ -682,13 +674,11 @@
                     btn.className = 'ready-to-print';
                     btn.textContent = 'Ready To Print';
                     btn.onclick = null;
-                    statusText.textContent = 'Druckplatte bereit – Bereit zum Drucken';
                 } else {
                     // Show Clear Plate button
                     btn.className = 'clear-plate-btn blinking';
                     btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
                     btn.textContent = '🧹 Clear Plate';
-                    statusText.textContent = 'Bereit zum Drucken';
                 }
             }
         }
