@@ -41,22 +41,22 @@
         .printers-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .printer-card {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 14px;
+            padding: 18px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         .printer-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 212, 255, 0.15);
             border-color: rgba(0, 212, 255, 0.3);
         }
 
@@ -70,16 +70,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
-        .printer-name { font-size: 13px; font-weight: 600; color: #ffffff; }
-        .printer-model { font-size: 9px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .printer-name { font-size: 15px; font-weight: 600; color: #ffffff; }
+        .printer-model { font-size: 10px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .status-badge {
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 8px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 9px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -278,22 +278,22 @@
         /* Update Button */
         .update-btn {
             position: fixed;
-            bottom: 8px;
-            right: 8px;
-            padding: 6px 12px;
+            top: 12px;
+            right: 12px;
+            padding: 8px 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             z-index: 100;
         }
 
-        .update-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
         .update-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
         /* Update Modal */
@@ -465,7 +465,7 @@
         <header>
             <h1>🖨️ Bambuddy Control</h1>
             <p class="subtitle">Clear Plate Management</p>
-            <p style="font-size: 9px; color: #718096; margin-top: 4px;" id="versionDisplay">v2.5.1</p>
+            <p style="font-size: 9px; color: #718096; margin-top: 4px;" id="versionDisplay">v1.0</p>
         </header>
 
         <div class="printers-grid" id="printersGrid">
