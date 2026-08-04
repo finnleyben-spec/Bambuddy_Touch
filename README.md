@@ -1,6 +1,6 @@
-# 🖨️ Bambuddy Touch — Smart Printer Dashboard
+# 🖨️ Bambuddy Touch — Smart Printer Dashboard v1.0
 
-Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimiert für Raspberry Pi mit Touchscreen.
+Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimiert für Raspberry Pi mit 800×480 Touchscreen.
 
 ## ✨ Features
 
@@ -9,7 +9,10 @@ Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimi
 - **🧹 Clear Plate** — Druckplatte zurücksetzen per Knopfdruck
 - **✅ Bestätigungsdialoge** — Verhindert versehentliche Aktionen
 - **🎨 Dark Glassmorphism UI** — Modernes, dunkles Design mit Glasmorphismus-Effekten
-- **📱 Touch-optimiert** — Perfekt für Raspberry Pi Touchscreens
+- **📱 Touch-optimiert** — Perfekt für 800×480 Raspberry Pi Touchscreens
+- **🔄 In-App Update** — Aktualisierung direkt aus der Oberfläche
+
+![Bambuddy Touch v1.0](docs/screenshot-v1.0.png)
 
 ## ⚠️ WICHTIG: Private Repo
 
