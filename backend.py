@@ -109,43 +109,39 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         if self.path == '/api/update':
             try:
                 print("🔄 Starting update...")
+                
+                # Step 1: Git pull
                 result = subprocess.run(
                     ['bash', '-c', 'cd ~/Bambuddy_Touch && git pull origin master'],
                     capture_output=True, text=True, timeout=60
                 )
                 
                 if result.returncode != 0:
-                    error_msg = result.stderr or result.stdout
+                    error_msg = (result.stderr or result.stdout).strip()
                     print(f"❌ Git pull failed: {error_msg}")
                     self.send_json_response(500, {"status": "error", "message": f"Git pull failed: {error_msg}"})
                     return
                 
-                # Restart service (try without sudo first)
-                restart_result = subprocess.run(
-                    ['systemctl', 'restart', 'bambuddy-touch'],
-                    capture_output=True, text=True, timeout=10
-                )
-                
-                if restart_result.returncode != 0:
-                    # Try with sudo
-                    restart_result2 = subprocess.run(
-                        ['sudo', '-n', 'systemctl', 'restart', 'bambuddy-touch'],
-                        capture_output=True, text=True, timeout=10
-                    )
-                    if restart_result2.returncode != 0:
-                        error_msg = restart_result.stderr or restart_result2.stderr
-                        print(f"❌ Service restart failed: {error_msg}")
-                        self.send_json_response(500, {"status": "error", "message": f"Service restart failed: {error_msg}"})
-                        return
-                
-                print("✅ Update successful!")
+                # Step 2: Send success response FIRST (before restarting)
                 self.send_json_response(200, {"status": "success", "message": "Update completed successfully"})
+                
+                # Step 3: Restart service in background (don't block the response)
+                subprocess.Popen(['sudo', '-n', 'systemctl', 'restart', 'bambuddy-touch'])
+                print("✅ Update successful! Service restart triggered.")
             except subprocess.TimeoutExpired:
                 print("❌ Update timed out")
-                self.send_json_response(504, {"status": "error", "message": "Update timed out"})
+                try:
+                    self.send_json_response(504, {"status": "error", "message": "Update timed out"})
+                except:
+                    pass
             except Exception as e:
+                import traceback
                 print(f"❌ Update error: {e}")
-                self.send_json_response(500, {"status": "error", "message": str(e)})
+                traceback.print_exc()
+                try:
+                    self.send_json_response(500, {"status": "error", "message": str(e)})
+                except:
+                    pass
             return
         
         # Serve frontend HTML
