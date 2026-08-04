@@ -82,36 +82,66 @@ Damit der Server automatisch beim Systemstart startet:
 
 ```bash
 # Service-Datei in systemd kopieren
-sudo cp bambuddy-clearplate.service /etc/systemd/system/
+sudo cp bambuddy-touch.service /etc/systemd/system/
 
 # Daemon neu laden, aktivieren und starten
 sudo systemctl daemon-reload
-sudo systemctl enable --now bambuddy-clearplate
+sudo systemctl enable --now bambuddy-touch
 
 # Status prüfen
-sudo systemctl status bambuddy-clearplate
+sudo systemctl status bambuddy-touch
+```
+
+### ⚠️ WICHTIG: Benutzer anpassen!
+
+Die Service-Datei hat standardmäßig `User=pi`. Falls dein Raspberry Pi-Benutzer anders heißt (z.B. `raspberry`), musst du die Datei anpassen:
+
+```bash
+sudo sed -i 's/User=pi/User=<DEIN_BENUTZER>/' /etc/systemd/system/bambuddy-touch.service
+sudo systemctl daemon-reload
+sudo systemctl restart bambuddy-touch
 ```
 
 ### Logs anzeigen
 
 ```bash
-sudo journalctl -u bambuddy-clearplate -f    # Live-Logs
-sudo journalctl -u bambuddy-clearplate --since today  # Heute
+sudo journalctl -u bambuddy-touch -f    # Live-Logs
+sudo journalctl -u bambuddy-touch --since today  # Heute
 ```
 
 ---
 
-## 🌐 Zugriff
+## 🖥️ Kiosk-Modus (Touchscreen, Fullscreen)
 
-| Methode | URL |
-|---------|-----|
-| Auf dem Pi (Browser) | `http://localhost:8080` |
-| Im lokalen Netzwerk | `http://<raspberry-pi-ip>:8080` |
+**Wichtig:** systemd-Services und crontab `@reboot` funktionieren **nicht zuverlässig** für den Kiosk-Modus auf Raspberry Pi OS mit labwc Desktop. Der Bildschirm ist oft noch nicht bereit wenn der Service startet → "platform failed to initialize".
 
-### Kiosk-Modus (Touchscreen, Fullscreen)
+### ✅ Funktionierende Methode: labwc autostart
 
 ```bash
-chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
+mkdir -p ~/.config/labwc
+nano ~/.config/labwc/autostart
+```
+
+Folgende Zeile eintragen (URL anpassen):
+
+```
+sleep 5 && chromium --kiosk --noerrdialogs --disable-infobars --no-first-run --start-maximized "http://localhost:8080" &
+```
+
+Speichern mit **Strg+O**, Enter, **Strg+X**.
+
+### Warum `sleep 5`?
+
+Der Bildschirm braucht einen Moment bis er bereit ist. Ohne Verzögerung startet Chromium zu früh → Fehler.
+
+### Kiosk stoppen (z.B. für Updates)
+
+```bash
+# Chromium beenden
+pkill chromium
+
+# Oder Neustart
+sudo reboot
 ```
 
 ---
@@ -120,7 +150,7 @@ chromium-browser --kiosk --noerrdialogs http://localhost:8080 &
 
 ### Einzeiler (empfohlen)
 ```bash
-cd ~/Bambuddy_Touch && git pull origin master && pkill python3; sleep 1; cd /home/pi/bambuddy-clearplate && python3 backend.py &
+cd ~/Bambuddy_Touch && git pull origin master && sudo systemctl restart bambuddy-touch
 ```
 
 ### Manuell
@@ -128,13 +158,10 @@ cd ~/Bambuddy_Touch && git pull origin master && pkill python3; sleep 1; cd /hom
 # 1. Update holen:
 cd ~/Bambuddy_Touch && git pull origin master
 
-# 2. Server stoppen:
-pkill -f "python3 backend.py"
+# 2. Server neu starten:
+sudo systemctl restart bambuddy-touch
 
-# 3. Server neu starten:
-cd /home/pi/bambuddy-clearplate && python3 backend.py &
-
-# 4. Browser: Strg + Shift + R (Hard Refresh)
+# 3. Browser: Strg + Shift + R (Hard Refresh)
 ```
 
 ---

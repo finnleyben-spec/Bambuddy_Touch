@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/Bambuddy_Touch
+User=raspberry
+WorkingDirectory=/home/raspberry/Bambuddy_Touch
 ExecStart=/usr/bin/python3 backend.py
 Restart=always
 RestartSec=5
