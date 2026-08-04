@@ -477,10 +477,10 @@
     <div class="container">
         <header>
             <div class="header-left">
-                <h1>🖨️ Bambuddy Control</h1>
+                <h1>Bambuddy Control</h1>
                 <p class="version-display" id="versionDisplay">v1.0</p>
             </div>
-            <button class="update-btn" onclick="openUpdateModal()">🔄 Update</button>
+            <button class="update-btn" onclick="openUpdateModal()">UPDATE</button>
         </header>
 
         <div class="printers-grid" id="printersGrid">
@@ -493,9 +493,9 @@
                     </div>
                     <span class="status-badge status-idle" id="status-2">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">🧹 Clear Plate</button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">CLEAR PLATE</button>
                 <div class="power-controls" id="power-controls-2">
-                    <button class="power-toggle-btn on" id="power-btn-2" onclick="confirmPowerToggle(2)">⏻ Aus</button>
+                    <button class="power-toggle-btn on" id="power-btn-2" onclick="confirmPowerToggle(2)">PWR OFF</button>
                 </div>
             </div>
 
@@ -508,9 +508,9 @@
                     </div>
                     <span class="status-badge status-idle" id="status-1">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">🧹 Clear Plate</button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">CLEAR PLATE</button>
                 <div class="power-controls" id="power-controls-1">
-                    <button class="power-toggle-btn on" id="power-btn-1" onclick="confirmPowerToggle(1)">⏻ Aus</button>
+                    <button class="power-toggle-btn on" id="power-btn-1" onclick="confirmPowerToggle(1)">PWR OFF</button>
                 </div>
             </div>
 
@@ -523,13 +523,13 @@
                     </div>
                     <span class="status-badge status-idle" id="status-3">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">🧹 Clear Plate</button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">CLEAR PLATE</button>
                 <div class="power-controls" id="power-controls-3">
-                    <button class="power-toggle-btn on" id="power-btn-3" onclick="confirmPowerToggle(3)">⏻ Aus</button>
+                    <button class="power-toggle-btn on" id="power-btn-3" onclick="confirmPowerToggle(3)">PWR OFF</button>
                 </div>
             </div>
 
-            <!-- Printer 4: H2D (ID: 4) -->
+            <!-- Printer 4: H2D #1 (ID: 4) -->
             <div class="printer-card" data-printer-id="4">
                 <div class="printer-header">
                     <div>
@@ -538,9 +538,9 @@
                     </div>
                     <span class="status-badge status-idle" id="status-4">IDLE</span>
                 </div>
-                <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">🧹 Clear Plate</button>
+                <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">CLEAR PLATE</button>
                 <div class="power-controls" id="power-controls-4">
-                    <button class="power-toggle-btn on" id="power-btn-4" onclick="confirmPowerToggle(4)">⏻ Aus</button>
+                    <button class="power-toggle-btn on" id="power-btn-4" onclick="confirmPowerToggle(4)">PWR OFF</button>
                 </div>
             </div>
         </div>
@@ -549,12 +549,12 @@
     <!-- Confirmation Modal -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
-            <div class="modal-icon">🧹</div>
-            <h2 class="modal-title">Clear Plate bestätigen?</h2>
-            <p class="modal-text" id="modalText">Möchtest du die Druckplatte von <strong>X1 Carbon #1</strong> als sauber markieren?</p>
+            <div class="modal-icon">[ ]</div>
+            <h2 class="modal-title">Clear Plate bestaetigen?</h2>
+            <p class="modal-text" id="modalText">Moechtest du die Druckplatte von <strong>X1 Carbon #1</strong> als sauber markieren?</p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">✓ Bestätigen</button>
+                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">OK Bestaetigen</button>
             </div>
         </div>
     </div>
@@ -562,25 +562,25 @@
     <!-- Power Toggle Confirmation Modal -->
     <div class="modal-overlay" id="powerModal">
         <div class="modal">
-            <div class="modal-icon">⚡</div>
+            <div class="modal-icon">[!]</div>
             <h2 class="modal-title" id="powerModalTitle">Steckdose?</h2>
-            <p class="modal-text" id="powerModalText">Möchtest du die Steckdose umschalten?</p>
+            <p class="modal-text" id="powerModalText">Moechtest du die Steckdose umschalten?</p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closePowerModal()">Abbrechen</button>
-                <button class="btn-confirm" onclick="confirmPowerToggleAction()">✓ Bestätigen</button>
+                <button class="btn-confirm" onclick="confirmPowerToggleAction()">OK Bestaetigen</button>
             </div>
         </div>
     </div>
 
     <!-- Success Animation -->
     <div class="success-animation" id="successAnimation">
-        <div class="success-icon">✓</div>
+        <div class="success-icon">[X]</div>
     </div>
 
     <!-- Update Confirmation Modal -->
     <div class="update-modal-overlay" id="updateModal">
         <div class="update-modal">
-            <div class="update-modal-icon">🔄</div>
+            <div class="update-modal-icon">[~]</div>
             <h2 class="update-modal-title">System aktualisieren?</h2>
             <p class="update-modal-text">Möchtest du das System auf die neueste Version updaten? Der Server wird kurz neu starten.</p>
             
@@ -594,7 +594,7 @@
             
             <div class="update-buttons">
                 <button class="btn-cancel" onclick="closeUpdateModal()">Abbrechen</button>
-                <button class="btn-confirm" id="confirmUpdateBtn" onclick="executeUpdate()">✓ Update starten</button>
+                <button class="btn-confirm" id="confirmUpdateBtn" onclick="executeUpdate()">OK Update starten</button>
             </div>
         </div>
     </div>
@@ -639,14 +639,14 @@
                 card.classList.add('disabled');
                 btn.disabled = true;
                 btn.classList.remove('blinking');
-                btn.textContent = '⏳ Druck läuft...';
+                btn.textContent = '[WAIT] Druck laeuft...';
                 btn.className = 'clear-plate-btn blinking';
             } else if (status === 'error') {
                 // ERROR: Reset button should be VISIBLE and ACTIVE
                 card.classList.remove('disabled');
                 btn.disabled = false;
                 btn.classList.remove('blinking');
-                btn.textContent = '🔄 Reset';
+                btn.textContent = '[RESET]';
                 btn.className = 'reset-btn';
                 btn.onclick = () => resetPrinter(printerId);
             } else if (status === 'complete') {
@@ -663,7 +663,7 @@
                     btn.classList.add('blinking');
                     btn.className = 'clear-plate-btn blinking';
                     btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
-                    btn.textContent = '🧹 Clear Plate';
+                    btn.textContent = 'CLEAR PLATE';
                 }
             } else {
                 // idle - check if plate has been cleared
@@ -680,7 +680,7 @@
                     // Show Clear Plate button
                     btn.className = 'clear-plate-btn blinking';
                     btn.onclick = () => openConfirmModal(printerId, printerStates[printerId].name);
-                    btn.textContent = '🧹 Clear Plate';
+                    btn.textContent = 'CLEAR PLATE';
                 }
             }
         }
@@ -703,7 +703,7 @@
 
             const btn = document.querySelector(`[data-printer-id="${currentPrinterId}"] .clear-plate-btn`);
             btn.disabled = true;
-            btn.textContent = '⏳ Wird gesendet...';
+            btn.textContent = '[WAIT] Wird gesendet...';
 
             try {
                 const response = await fetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
@@ -739,7 +739,7 @@
                 alert('Fehler beim Senden des Clear Plate Befehls: ' + error.message);
             } finally {
                 btn.disabled = false;
-                btn.textContent = '🧹 Clear Plate';
+                btn.textContent = 'CLEAR PLATE';
                 closeModal();
             }
         }
@@ -751,7 +751,7 @@
             if (!btn || btn.disabled) return;
             
             btn.disabled = true;
-            btn.textContent = '⏳ Reset wird gesendet...';
+            btn.textContent = '[WAIT] Reset wird gesendet...';
 
             try {
                 // Call the clear-plate endpoint without trailing slash (works for reset)
@@ -781,7 +781,7 @@
             } catch (error) {
                 alert('Fehler beim Reset: ' + error.message);
                 btn.disabled = false;
-                btn.textContent = '🔄 Reset';
+                btn.textContent = 'RESET';
             }
         }
 
@@ -895,13 +895,13 @@
             
             // Update button text and class
             if (btn) {
-                btn.textContent = isOn ? '⏻ Aus' : '⏻ An';
+                btn.textContent = isOn ? 'PWR OFF' : 'PWR ON';
                 btn.className = `power-toggle-btn ${isOn ? 'on' : 'off'}`;
             }
             
             // Update status text
             if (statusEl) {
-                statusEl.textContent = isOn ? '✓ Steckdose an' : '✗ Steckdose aus';
+                statusEl.textContent = isOn ? 'PLUG ON' : 'PLUG OFF';
                 statusEl.className = `power-status-text ${isOn ? 'on' : 'off'}`;
             }
             
@@ -910,7 +910,7 @@
                 if (!isOn) {
                     card.classList.add('power-off');
                     const statusText = document.getElementById(`status-text-${printerId}`);
-                    if (statusText) statusText.textContent = '⚡ Steckdose aus';
+                    if (statusText) statusText.textContent = 'PLUG OFF';
                 } else {
                     card.classList.remove('power-off');
                 }
@@ -983,14 +983,14 @@
                 }
             } catch (error) {
                 console.error(`Error controlling power for printer ${printerId}:`, error);
-                btn.textContent = '✗';
+                btn.textContent = 'X';
                 setTimeout(() => {
                     if (btn) {
                         const data = smartPlugData[printerId];
                         if (data && data.id) {
                             updatePowerUI(printerId, data);
                         } else {
-                            btn.textContent = '⏻ An / Aus';
+                            btn.textContent = 'PWR ON/OFF';
                             btn.disabled = false;
                         }
                     }
