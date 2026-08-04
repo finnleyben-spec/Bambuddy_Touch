@@ -25,18 +25,25 @@
             border-radius: 12px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header .header-left {
+            text-align: left;
         }
 
         h1 {
             font-size: 22px;
-            margin-bottom: 2px;
+            margin-bottom: 0;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .subtitle { color: #a0aec0; font-size: 13px; }
+        .version-display { font-size: 10px; color: #718096; margin-top: 2px; }
 
         .printers-grid {
             display: grid;
@@ -285,22 +292,18 @@
             font-size: 12px;
         }
 
-        /* Update Button */
+        /* Update Button - integrated in header */
         .update-btn {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             border-radius: 10px;
             color: white;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            z-index: 100;
         }
 
         .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
@@ -473,9 +476,11 @@
 <body>
     <div class="container">
         <header>
-            <h1>🖨️ Bambuddy Control</h1>
-            <p class="subtitle">Clear Plate Management</p>
-            <p style="font-size: 9px; color: #718096; margin-top: 4px;" id="versionDisplay">v1.0</p>
+            <div class="header-left">
+                <h1>🖨️ Bambuddy Control</h1>
+                <p class="version-display" id="versionDisplay">v1.0</p>
+            </div>
+            <button class="update-btn" onclick="openUpdateModal()">🔄 Update</button>
         </header>
 
         <div class="printers-grid" id="printersGrid">
