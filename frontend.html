@@ -5,11 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bambuddy - Clear Plate</title>
     <style>
+        /* ============================================
+           CSS VARIABLES - Zentrale Design-Tokens
+           Ändere hier Farben, Größen und Einstellungen
+           ============================================ */
+        :root {
+            /* Farben - Hintergrund */
+            --bg-dark: #1a1a2e;
+            --bg-mid: #16213e;
+            --bg-light: #0f3460;
+
+            /* Farben - Akzente (Apple Liquid Glass) */
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7b2cbf;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #ed8936;
+
+            /* Farben - Status */
+            --status-idle-bg: rgba(16, 185, 129, 0.15);
+            --status-idle-text: #6ee7b7;
+            --status-printing-bg: rgba(59, 130, 246, 0.15);
+            --status-printing-text: #93c5fd;
+            --status-error-bg: rgba(239, 68, 68, 0.15);
+            --status-error-text: #fca5a5;
+
+            /* Farben - Weiß */
+            --white-5: rgba(255, 255, 255, 0.05);
+            --white-6: rgba(255, 255, 255, 0.06);
+            --white-8: rgba(255, 255, 255, 0.08);
+            --white-10: rgba(255, 255, 255, 0.1);
+            --white-14: rgba(255, 255, 255, 0.14);
+
+            /* Farben - Schwarz */
+            --black-15: rgba(0, 0, 0, 0.15);
+            --black-25: rgba(0, 0, 0, 0.25);
+
+            /* Farben - Grau */
+            --gray-text: #a0aec0;
+            --gray-dim: #718096;
+            --gray-disabled: rgba(128, 128, 128, 0.3);
+
+            /* Schatten */
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            --shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+            /* Abmessungen */
+            --card-radius: 14px;
+            --btn-radius: 8px;
+            --badge-radius: 9999px;
+
+            /* Update-Button Farben (unterschiedlich von Hauptakzent) */
+            --update-blue: #667eea;
+            --update-purple: #764ba2;
+
+            /* Modal-Hintergründe */
+            --modal-overlay-bg: rgba(0, 0, 0, 0.8);
+            --progress-track-bg: rgba(255, 255, 255, 0.1);
+
+            /* Power-Status Farben */
+            --power-on-bg: rgba(239, 68, 68, 0.15);
+            --power-off-bg: var(--status-idle-bg);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-light) 100%);
             min-height: 100vh;
             padding: 8px;
             color: #ffffff;
@@ -21,10 +84,10 @@
             text-align: center;
             margin-bottom: 12px;
             padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, var(--white-5));
             border-radius: 12px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, var(--white-10));
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -37,7 +100,7 @@
         h1 {
             font-size: 22px;
             margin-bottom: 0;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -53,24 +116,20 @@
         }
 
         .printer-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(255,255,255,var(--white-6)) 0%, rgba(255,255,255,var(--white-2)) 100%);
+            border-radius: var(--card-radius);
             padding: 18px;
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 
-                0 4px 24px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, var(--white-8));
+            box-shadow: var(--shadow-card);
             transition: all 0.3s ease;
         }
 
         .printer-card:hover {
             transform: translateY(-2px);
-            box-shadow: 
-                0 8px 40px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: var(--shadow-card-hover);
+            border-color: rgba(255, 255, 255, var(--white-14));
         }
 
         .printer-card.disabled {
@@ -98,17 +157,17 @@
             letter-spacing: 0.4px;
         }
 
-        .status-idle { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-printing { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .status-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-complete { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-idle { background: var(--status-idle-bg); color: var(--status-idle-text); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-printing { background: var(--status-printing-bg); color: var(--status-printing-text); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .status-error { background: var(--status-error-bg); color: var(--status-error-text); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-complete { background: var(--status-idle-bg); color: var(--status-idle-text); border: 1px solid rgba(16, 185, 129, 0.3); }
 
         .clear-plate-btn {
             width: 100%;
             padding: 10px 14px;
-            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: var(--btn-radius);
             color: white;
             font-size: 14px;
             font-weight: 600;
@@ -116,12 +175,12 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, var(--white-3));
         }
 
-        .clear-plate-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4); }
+        .clear-plate-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 212, 255, var(--white-4)); }
         .clear-plate-btn:active:not(:disabled) { transform: translateY(0); }
-        .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: rgba(128, 128, 128, 0.3); box-shadow: none; }
+        .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: var(--gray-disabled); box-shadow: none; }
 
         @keyframes blink {
             0%, 100% { opacity: 1; transform: scale(1); }
@@ -130,15 +189,15 @@
 
         .clear-plate-btn.blinking {
             animation: blink 1.5s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(72, 187, 120, 0.6), 0 4px 15px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(72, 187, 120, var(--white-6)), 0 4px 15px rgba(0, 212, 255, var(--white-3));
         }
 
         .reset-btn {
             width: 100%;
             padding: 10px 14px;
-            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-orange) 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: var(--btn-radius);
             color: white;
             font-size: 14px;
             font-weight: 600;
@@ -146,19 +205,19 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+            box-shadow: 0 4px 15px rgba(245, 101, 101, var(--white-3));
         }
 
-        .reset-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4); }
+        .reset-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245, 101, 101, var(--white-4)); }
 
         /* Ready To Print button - prominent and clear */
         .ready-to-print {
             width: 100%;
             padding: 10px 14px;
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            border-radius: 8px;
-            color: #6ee7b7;
+            background: var(--status-idle-bg);
+            border: 1px solid rgba(16, 185, 129, var(--white-35));
+            border-radius: var(--btn-radius);
+            color: var(--status-idle-text);
             font-size: 13px;
             font-weight: 700;
             cursor: default;
@@ -177,12 +236,12 @@
             height: 8px;
             border-radius: 50%;
             background: #10b981;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
+            box-shadow: 0 0 12px rgba(16, 185, 129, var(--white-7));
         }
 
         .ready-to-print:hover {
-            background: rgba(16, 185, 129, 0.18);
-            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, var(--white-18));
+            border-color: rgba(16, 185, 129, var(--white-50));
         }
 
         /* Power Control - Single Toggle Button */
@@ -191,7 +250,7 @@
             gap: 4px;
             margin-top: 6px;
             padding-top: 6px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid var(--white-6);
         }
 
         .power-toggle-btn {
@@ -213,26 +272,26 @@
 
         /* When printer is ON - show red "Aus" button (prominent) */
         .power-toggle-btn.on {
-            background: rgba(239, 68, 68, 0.15);
+            background: var(--power-on-bg);
             color: #fca5a5;
             border: 1px solid rgba(239, 68, 68, 0.4);
         }
 
         .power-toggle-btn.on:hover {
-            background: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, var(--white-25));
             border-color: rgba(239, 68, 68, 0.6);
             transform: translateY(-1px);
         }
 
         /* When printer is OFF - show green "An" button (prominent) */
         .power-toggle-btn.off {
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
+            background: var(--status-idle-bg);
+            color: var(--status-idle-text);
             border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
         .power-toggle-btn.off:hover {
-            background: rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, var(--white-25));
             border-color: rgba(16, 185, 129, 0.6);
             transform: translateY(-1px);
         }
@@ -290,16 +349,16 @@
             padding: 10px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 10px;
+            border-radius: var(--btn-radius);
             color: white;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, var(--white-3));
         }
 
-        .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, var(--white-4)); }
         .update-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
         /* Update Modal */
@@ -318,13 +377,13 @@
         .update-modal-overlay.active { display: flex; }
 
         .update-modal {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 14px;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+            border-radius: var(--card-radius);
             padding: 20px;
             max-width: 320px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, var(--white-10));
+            box-shadow: 0 16px 48px rgba(0, 0, 0, var(--black-50));
         }
 
         .update-modal-icon { font-size: 32px; text-align: center; margin-bottom: 12px; }
