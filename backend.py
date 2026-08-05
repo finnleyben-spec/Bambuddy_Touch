@@ -40,6 +40,9 @@ API_KEY = os.getenv('BAMBUDY_API_KEY', '')
 AUTH_USERNAME = os.getenv('BAMBUDY_AUTH_USERNAME', '')
 AUTH_PASSWORD = os.getenv('BAMBUDY_AUTH_PASSWORD', '')
 
+# API-Schutz: Key der vom Frontend mitgesendet werden muss (X-API-Key Header)
+BACKEND_API_KEY = os.getenv('BACKEND_API_KEY', 'bambuddy-local-key')
+
 # JWT token (loaded at startup via login)
 JWT_TOKEN = None
 
@@ -102,8 +105,22 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         
         return headers
 
+    def check_api_key(self):
+        """Prüft ob der Frontend einen gültigen API-Key mitgesendet hat."""
+        client_key = self.headers.get('X-API-Key', '')
+        if not BACKEND_API_KEY or client_key == BACKEND_API_KEY:
+            return True  # Key deaktiviert oder korrekt
+        
+        print(f"⚠️  Ungültiger API-Key von {self.client_address[0]}")
+        self.send_json_response(401, {"error": "Unauthorized - Invalid API key"})
+        return False
+
     def do_GET(self):
         """Handle GET requests - serve static files or fetch printer status."""
+        
+        # API-Schutz: Prüfe API-Key für alle /api/ Endpunkte
+        if self.path.startswith('/api/') and not self.check_api_key():
+            return
         
         # Update endpoint: /api/update -> run git pull + restart service
         if self.path == '/api/update':
@@ -210,6 +227,10 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         """Handle POST requests - proxy to API."""
+        
+        # API-Schutz: Prüfe API-Key für alle /api/ Endpunkte
+        if self.path.startswith('/api/') and not self.check_api_key():
+            return
         
         # Read request body
         content_length = int(self.headers.get('Content-Length', 0))

@@ -652,7 +652,21 @@
     </div>
 
     <script>
-        const config = { apiUrl: '/api' };
+        const config = { 
+            apiUrl: '/api',
+            apiKey: 'bambuddy-local-key'  // API-Key für Backend-Schutz
+        };
+
+        // Fetch-Wrapper mit automatischem API-Key
+        async function secureFetch(url, options = {}) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'X-API-Key': config.apiKey  // Fügt API-Key hinzu
+                }
+            });
+        }
         
         const printerStates = {
             1: { status: 'idle', name: 'X1 Carbon #2' },
