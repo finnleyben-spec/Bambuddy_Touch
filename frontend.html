@@ -778,12 +778,13 @@
             }
         }
 
-        // Status automatisch aktualisieren (alle 10 Sekunden)
+        // Status automatisch aktualisieren (optimiert mit Parallel-Requests)
         async function pollPrinterStatus() {
             try {
                 const printerIds = [1, 2, 3, 4];
                 
-                for (const id of printerIds) {
+                // Parallel alle Drucker abfragen statt sequenziell
+                await Promise.all(printerIds.map(async (id) => {
                     try {
                         const response = await fetch(`${config.apiUrl}/printers/${id}/status`);
                         if (response.ok) {
@@ -816,7 +817,7 @@
                     } catch (err) {
                         console.error(`Fehler beim Abrufen Status für Drucker ${id}:`, err);
                     }
-                }
+                }));  // Close Promise.all and map callback
             } catch (error) {
                 console.error('Fehler beim Abrufen des Status:', error);
             }
