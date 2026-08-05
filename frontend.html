@@ -602,11 +602,11 @@
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
             <div class="modal-icon">[ ]</div>
-            <h2 class="modal-title">Clear Plate bestaetigen?</h2>
-            <p class="modal-text" id="modalText">Moechtest du die Druckplatte von <strong>X1 Carbon #1</strong> als sauber markieren?</p>
+            <h2 class="modal-title">Clear Plate bestätigen?</h2>
+            <p class="modal-text" id="modalText">Möchtest du die Druckplatte von <strong>X1 Carbon #1</strong> als leer markieren?</p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">OK Bestaetigen</button>
+                <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">Bestätigen</button>
             </div>
         </div>
     </div>
@@ -616,10 +616,10 @@
         <div class="modal">
             <div class="modal-icon">[!]</div>
             <h2 class="modal-title" id="powerModalTitle">Steckdose?</h2>
-            <p class="modal-text" id="powerModalText">Moechtest du die Steckdose umschalten?</p>
+            <p class="modal-text" id="powerModalText">Möchtest du die Steckdose umschalten?</p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closePowerModal()">Abbrechen</button>
-                <button class="btn-confirm" onclick="confirmPowerToggleAction()">OK Bestaetigen</button>
+                <button class="btn-confirm" onclick="confirmPowerToggleAction()">Bestätigen</button>
             </div>
         </div>
     </div>
@@ -705,7 +705,7 @@
                 card.classList.add('disabled');
                 btn.disabled = true;
                 btn.classList.remove('blinking');
-                btn.textContent = '[WAIT] Druck laeuft...';
+                btn.textContent = '[WAIT] Druck läuft...';
                 btn.className = 'clear-plate-btn blinking';
             } else if (status === 'error') {
                 // ERROR: Reset button should be VISIBLE and ACTIVE
@@ -754,7 +754,7 @@
         function openConfirmModal(printerId, printerName) {
             currentPrinterId = printerId;
             currentPrinterName = printerName;
-            document.getElementById('modalText').innerHTML = `Möchtest du die Druckplatte von <strong>${printerName}</strong> als sauber markieren?`;
+            document.getElementById('modalText').innerHTML = `Möchtest du die Druckplatte von <strong>${printerName}</strong> als leer markieren?`;
             document.getElementById('confirmModal').classList.add('active');
         }
 
