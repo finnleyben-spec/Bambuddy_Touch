@@ -772,7 +772,7 @@
             btn.textContent = '[WAIT] Wird gesendet...';
 
             try {
-                const response = await fetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
+                const response = await secureFetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'idle' })
@@ -787,7 +787,7 @@
 
                     // Immediately refresh printer status from API
                     try {
-                        const statusResponse = await fetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
+                        const statusResponse = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
                         if (statusResponse.ok) {
                             const statusData = await statusResponse.json();
                             updatePrinterStatus(currentPrinterId, statusData.state || 'idle', statusData.plateCleared);
@@ -821,7 +821,7 @@
 
             try {
                 // Call the clear-plate endpoint without trailing slash (works for reset)
-                const response = await fetch(`${config.apiUrl}/printers/${printerId}/clear-plate`, {
+                const response = await secureFetch(`${config.apiUrl}/printers/${printerId}/clear-plate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ state: 'IDLE' })
@@ -859,7 +859,7 @@
                 // Parallel alle Drucker abfragen statt sequenziell
                 await Promise.all(printerIds.map(async (id) => {
                     try {
-                        const response = await fetch(`${config.apiUrl}/printers/${id}/status`);
+                        const response = await secureFetch(`${config.apiUrl}/printers/${id}/status`);
                         if (response.ok) {
                             const data = await response.json();
                             
@@ -929,7 +929,7 @@
             
             for (const id of printerIds) {
                 try {
-                    const response = await fetch(`${config.apiUrl}/printers/${id}/smart-plug`);
+                    const response = await secureFetch(`${config.apiUrl}/printers/${id}/smart-plug`);
                     if (response.ok) {
                         const data = await response.json();
                         smartPlugData[id] = data;
@@ -1023,7 +1023,7 @@
             btn.textContent = '⏳ ...';
             
             try {
-                const response = await fetch(`${config.apiUrl}/printers/${printerId}/smart-plug/control`, {
+                const response = await secureFetch(`${config.apiUrl}/printers/${printerId}/smart-plug/control`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action })
@@ -1035,7 +1035,7 @@
                     
                     // Immediately refresh printer status from API
                     try {
-                        const statusResponse = await fetch(`${config.apiUrl}/printers/${printerId}/status`);
+                        const statusResponse = await secureFetch(`${config.apiUrl}/printers/${printerId}/status`);
                         if (statusResponse.ok) {
                             const statusData = await statusResponse.json();
                             updatePrinterStatus(printerId, statusData.state || 'idle', statusData.plateCleared);
@@ -1114,7 +1114,7 @@
                 progressBar.style.width = '40%';
                 statusEl.textContent = 'Lade neueste Version herunter...';
                 
-                const response = await fetch('/api/update', { method: 'GET' });
+                const response = await secureFetch('/api/update', { method: 'GET' });
                 const data = await response.json();
                 
                 if (data.status === 'success') {
