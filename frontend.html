@@ -772,6 +772,7 @@
             btn.textContent = '[WAIT] Wird gesendet...';
 
             try {
+                // POST-Anfrage senden (kann auf dem Pi etwas dauern)
                 const response = await secureFetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -779,13 +780,18 @@
                 });
 
                 if (response.ok) {
-                    // Erfolg anzeigen
+                    // Sofort UI aktualisieren (optimistic update) - keine Wartezeit!
                     document.getElementById('successAnimation').classList.add('active');
+                    
+                    // Status sofort auf "leer" setzen - sofortiges Feedback!
+                    updatePrinterStatus(currentPrinterId, 'idle', true);
+                    
+                    // Animation nach 1.5s ausblenden (schneller als vorherige 2s)
                     setTimeout(() => {
                         document.getElementById('successAnimation').classList.remove('active');
-                    }, 2000);
+                    }, 1500);
 
-                    // Sofort Status von der API aktualisieren
+                    // Im Hintergrund echten Status von API laden (korrigiert falls nötig)
                     try {
                         const statusResponse = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
                         if (statusResponse.ok) {
