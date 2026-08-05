@@ -785,7 +785,7 @@
                         document.getElementById('successAnimation').classList.remove('active');
                     }, 2000);
 
-                    // Immediately refresh printer status from API
+                    // Sofort Status von der API aktualisieren
                     try {
                         const statusResponse = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
                         if (statusResponse.ok) {
@@ -793,11 +793,8 @@
                             updatePrinterStatus(currentPrinterId, statusData.state || 'idle', statusData.plateCleared);
                         }
                     } catch (e) {
-                        console.warn('Could not refresh printer status after clear plate:', e);
+                        console.warn('Konnte Status nach Clear Plate nicht aktualisieren:', e);
                     }
-
-                    // Status auf idle setzen
-                    updatePrinterStatus(currentPrinterId, 'idle');
                 } else {
                     throw new Error('API-Fehler');
                 }
