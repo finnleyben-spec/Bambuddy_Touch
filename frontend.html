@@ -851,7 +851,7 @@
             }
         }
 
-        // Status automatisch aktualisieren (optimiert mit Parallel-Requests)
+        // Status automatisch aktualisieren (optimiert für Raspberry Pi)
         async function pollPrinterStatus() {
             try {
                 const printerIds = [1, 2, 3, 4];
@@ -896,6 +896,19 @@
             }
         }
 
+        // Intelligentes Polling: Nur alle 20 Sekunden, spart CPU und Netzwerk
+        let lastPollTime = 0;
+        const POLL_INTERVAL = 20 * 1000; // 20 Sekunden
+        
+        function smartPoll() {
+            const now = Date.now();
+            if (now - lastPollTime >= POLL_INTERVAL) {
+                pollPrinterStatus();
+                lastPollTime = now;
+            }
+            setTimeout(smartPoll, 5000); // Prüfe alle 5 Sekunden ob Zeit für Polling da ist
+        }
+
         // Initialisierung
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Initializing Bambuddy Touch...');
@@ -910,8 +923,8 @@
             // Start polling printer status
             pollPrinterStatus();
             
-            // Refresh every 10 seconds
-            setInterval(pollPrinterStatus, 10000);
+            // Intelligentes Polling starten
+            smartPoll();
         });
 
         // Modal schließen bei Klick außerhalb
@@ -1083,8 +1096,8 @@
             // Start polling printer status
             pollPrinterStatus();
             
-            // Refresh every 10 seconds
-            setInterval(pollPrinterStatus, 10000);
+            // Intelligentes Polling starten (spart CPU und Netzwerk)
+            smartPoll();
         });
 
         // Update Modal Functions
