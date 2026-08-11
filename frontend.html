@@ -164,21 +164,21 @@
 
         .clear-plate-btn {
             width: 100%;
-            padding: 10px 14px;
+            padding: 18px 14px;
             background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
             border: none;
             border-radius: var(--btn-radius);
             color: white;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, var(--white-3));
+            letter-spacing: 2px;
+            box-shadow: 0 6px 25px rgba(0, 212, 255, var(--white-4));
         }
 
-        .clear-plate-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 212, 255, var(--white-4)); }
+        .clear-plate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 212, 255, var(--white-5)); }
         .clear-plate-btn:active:not(:disabled) { transform: translateY(0); }
         .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: var(--gray-disabled); box-shadow: none; }
 
@@ -189,7 +189,7 @@
 
         .clear-plate-btn.blinking {
             animation: blink 1.5s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(72, 187, 120, var(--white-6)), 0 4px 15px rgba(0, 212, 255, var(--white-3));
+            box-shadow: 0 0 25px rgba(72, 187, 120, var(--white-7)), 0 6px 25px rgba(0, 212, 255, var(--white-4));
         }
 
         .reset-btn {
@@ -244,25 +244,28 @@
             border-color: rgba(16, 185, 129, var(--white-50));
         }
 
-        /* Power Control - Single Toggle Button */
+        /* Power Control - Compact & Subtle */
         .power-controls {
             display: flex;
             gap: 4px;
-            margin-top: 6px;
+            margin-top: 8px;
             padding-top: 6px;
             border-top: 1px solid var(--white-6);
+            justify-content: center;
         }
 
         .power-toggle-btn {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
+            width: 52px;
+            height: 24px;
+            min-width: 52px;
+            padding: 0;
+            border-radius: 12px;
+            font-size: 8px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             border: none;
             display: flex;
             align-items: center;
