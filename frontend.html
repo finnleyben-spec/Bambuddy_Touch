@@ -243,54 +243,54 @@
 
         .reset-btn {
             width: 100%;
-            padding: 10px 14px;
+            padding: 18px 14px;
             background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-orange) 100%);
             border: none;
             border-radius: var(--btn-radius);
             color: white;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(245, 101, 101, var(--white-3));
+            letter-spacing: 2px;
+            box-shadow: 0 6px 25px rgba(245, 101, 101, var(--white-4));
         }
 
-        .reset-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245, 101, 101, var(--white-4)); }
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245, 101, 101, var(--white-5)); }
 
-        /* Ready To Print button - prominent and clear */
+        /* Ready To Print button - same size as clear plate */
         .ready-to-print {
             width: 100%;
-            padding: 10px 14px;
-            background: var(--status-idle-bg);
-            border: 1px solid rgba(16, 185, 129, var(--white-35));
+            padding: 18px 14px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
             border-radius: var(--btn-radius);
-            color: var(--status-idle-text);
-            font-size: 13px;
+            color: white;
+            font-size: 18px;
             font-weight: 700;
             cursor: default;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .ready-to-print::before {
             content: '';
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 12px rgba(16, 185, 129, var(--white-7));
+            background: #34d399;
+            box-shadow: 0 0 16px rgba(52, 211, 153, var(--white-8));
         }
 
         .ready-to-print:hover {
-            background: rgba(16, 185, 129, var(--white-18));
-            border-color: rgba(16, 185, 129, var(--white-50));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, var(--white-4));
         }
 
         /* Power Control - Compact & Subtle */
