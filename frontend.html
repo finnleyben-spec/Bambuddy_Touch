@@ -143,9 +143,10 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 8px;
+            gap: 6px;
         }
 
-        .printer-name { font-size: 15px; font-weight: 600; color: #ffffff; }
+        .printer-name { font-size: 15px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 8px; }
         .printer-model { font-size: 11px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.3px; }
 
         .status-badge {
@@ -155,6 +156,54 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+        }
+
+        /* Power button in header - inline with name */
+        .header-power-btn {
+            width: auto;
+            height: 26px;
+            min-width: 56px;
+            padding: 0 10px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .header-power-btn.on {
+            background: var(--power-on-bg);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .header-power-btn.on:hover {
+            background: rgba(239, 68, 68, var(--white-25));
+            border-color: rgba(239, 68, 68, 0.6);
+        }
+
+        .header-power-btn.off {
+            background: var(--status-idle-bg);
+            color: var(--status-idle-text);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .header-power-btn.off:hover {
+            background: rgba(16, 185, 129, var(--white-25));
+            border-color: rgba(16, 185, 129, 0.6);
+        }
+
+        .header-power-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         .status-idle { background: var(--status-idle-bg); color: var(--status-idle-text); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -541,61 +590,41 @@
             <!-- Printer 1: X1C #1 (ID: 2) -->
             <div class="printer-card" data-printer-id="2">
                 <div class="printer-header">
-                    <div>
-                        <div class="printer-name">X1 Carbon</div>
-                        <div class="printer-model">#1 - Schrank o.l.</div>
-                    </div>
+                    <div class="printer-name">X1 Carbon #1 <button class="header-power-btn on" id="power-btn-2" onclick="confirmPowerToggle(2)">PWR OFF</button></div>
                     <span class="status-badge status-idle" id="status-2">IDLE</span>
                 </div>
+                <div class="printer-model">#1 - Schrank o.l.</div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(2, 'X1 Carbon #1')" data-printer-id="2">CLEAR PLATE</button>
-                <div class="power-controls" id="power-controls-2">
-                    <button class="power-toggle-btn on" id="power-btn-2" onclick="confirmPowerToggle(2)">PWR OFF</button>
-                </div>
             </div>
 
             <!-- Printer 2: X1C #2 (ID: 1) -->
             <div class="printer-card" data-printer-id="1">
                 <div class="printer-header">
-                    <div>
-                        <div class="printer-name">X1 Carbon</div>
-                        <div class="printer-model">#2 - Schrank o.r.</div>
-                    </div>
+                    <div class="printer-name">X1 Carbon #2 <button class="header-power-btn on" id="power-btn-1" onclick="confirmPowerToggle(1)">PWR OFF</button></div>
                     <span class="status-badge status-idle" id="status-1">IDLE</span>
                 </div>
+                <div class="printer-model">#2 - Schrank o.r.</div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(1, 'X1 Carbon #2')" data-printer-id="1">CLEAR PLATE</button>
-                <div class="power-controls" id="power-controls-1">
-                    <button class="power-toggle-btn on" id="power-btn-1" onclick="confirmPowerToggle(1)">PWR OFF</button>
-                </div>
             </div>
 
             <!-- Printer 3: X1C #3 (ID: 3) -->
             <div class="printer-card" data-printer-id="3">
                 <div class="printer-header">
-                    <div>
-                        <div class="printer-name">X1 Carbon</div>
-                        <div class="printer-model">#3 - Schrank u.r.</div>
-                    </div>
+                    <div class="printer-name">X1 Carbon #3 <button class="header-power-btn on" id="power-btn-3" onclick="confirmPowerToggle(3)">PWR OFF</button></div>
                     <span class="status-badge status-idle" id="status-3">IDLE</span>
                 </div>
+                <div class="printer-model">#3 - Schrank u.r.</div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(3, 'X1 Carbon #3')" data-printer-id="3">CLEAR PLATE</button>
-                <div class="power-controls" id="power-controls-3">
-                    <button class="power-toggle-btn on" id="power-btn-3" onclick="confirmPowerToggle(3)">PWR OFF</button>
-                </div>
             </div>
 
             <!-- Printer 4: H2D #1 (ID: 4) -->
             <div class="printer-card" data-printer-id="4">
                 <div class="printer-header">
-                    <div>
-                        <div class="printer-name">H2D</div>
-                        <div class="printer-model">#1 - Theke Fenster</div>
-                    </div>
+                    <div class="printer-name">H2D #1 <button class="header-power-btn on" id="power-btn-4" onclick="confirmPowerToggle(4)">PWR OFF</button></div>
                     <span class="status-badge status-idle" id="status-4">IDLE</span>
                 </div>
+                <div class="printer-model">#1 - Theke Fenster</div>
                 <button class="clear-plate-btn blinking" onclick="openConfirmModal(4, 'H2D #1')" data-printer-id="4">CLEAR PLATE</button>
-                <div class="power-controls" id="power-controls-4">
-                    <button class="power-toggle-btn on" id="power-btn-4" onclick="confirmPowerToggle(4)">PWR OFF</button>
-                </div>
             </div>
         </div>
     </div>
