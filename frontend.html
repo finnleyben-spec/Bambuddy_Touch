@@ -250,13 +250,13 @@
         .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: var(--gray-disabled); box-shadow: none; }
 
         @keyframes yellowBlink {
-            0%   { opacity: 1; transform: scale(1); box-shadow: 0 0 30px rgba(251, 191, 36, 0.8), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
-            50%  { opacity: 0.4; transform: scale(0.97); box-shadow: 0 0 8px rgba(251, 191, 36, 0.2), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
-            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 30px rgba(251, 191, 36, 0.8), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
+            0%   { opacity: 1; transform: scale(1); box-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 80px rgba(251, 191, 36, 0.6), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
+            50%  { opacity: 0.1; transform: scale(0.95); box-shadow: 0 0 5px rgba(251, 191, 36, 0.1), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
+            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 80px rgba(251, 191, 36, 0.6), 0 4px 20px rgba(251, 191, 36, var(--white-4)); }
         }
 
         .clear-plate-btn.blinking {
-            animation: yellowBlink 3s ease-in-out infinite;
+            animation: yellowBlink 1.5s ease-in-out infinite;
         }
 
         /* Reset button */
