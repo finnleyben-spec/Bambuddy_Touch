@@ -239,6 +239,10 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 4px 20px rgba(251, 191, 36, var(--white-4));
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .clear-plate-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(251, 191, 36, var(--white-5)); }
@@ -252,7 +256,7 @@
         }
 
         .clear-plate-btn.blinking {
-            animation: yellowBlink 1s ease-in-out infinite;
+            animation: yellowBlink 3s ease-in-out infinite;
         }
 
         /* Reset button */
@@ -292,6 +296,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            flex-grow: 1;
         }
 
         .ready-to-print::before {
