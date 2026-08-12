@@ -802,23 +802,70 @@
             apiKey: 'bambuddy-local-key'  // API-Key für Backend-Schutz
         };
 
-        // Fetch-Wrapper mit automatischem API-Key
+und API-Key
         async function secureFetch(url, options = {}) {
-            return fetch(url, {
-                ...options,
-                headers: {
-                    ...options.headers,
-                    'X-API-Key': config.apiKey  // Fügt API-Key hinzu
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), config.fetchTimeout);
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    headers: {
+                        ...options.headers,
+                        'X-API-Key': config.apiKey
+                    }
+                });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw new Error('Zeitüberschreitung');
                 }
-            });
+                throw error;
+            }
         }
         
         const printerStates = {
-            1: { status: 'idle', name: 'X1 Carbon #2' },
-            2: { status: 'idle', name: 'X1 Carbon #1' },
-            3: { status: 'idle', name: 'X1 Carbon #3' },
-            4: { status: 'idle', name: 'H2D #1' }
+            1: { status: 'idle', name: 'Printer 1' },
+            2: { status: 'idle', name: 'Printer 2' },
+            3: { status: 'idle', name: 'Printer 3' },
+            4: { status: 'idle', name: 'Printer 4' }
         };
+
+        // Load real printer names from API
+        async function loadPrinterNames() {
+            try {
+                const response = await secureFetch(`${config.apiUrl}/printers`);
+                if (response.ok) {
+                    const printers = await response.json();
+                    
+                    // Map API printer data to our states
+                    printers.forEach(printer => {
+                        const id = String(printer.id || printer.printer_id);
+                        const name = printer.name || printer.nickname || `Printer ${id}`;
+                        
+                        if (printerStates[id]) {
+                            printerStates[id].name = name;
+                            
+                            // Update the card title
+                            const card = document.querySelector(`[data-printer-id="${id}"]`);
+                            if (card) {
+                                const nameEl = card.querySelector('.printer-name');
+                                if (nameEl && !nameEl.querySelector('button')) {
+                                    nameEl.textContent = name;
+                                }
+                            }
+                        }
+                    });
+                    
+                    console.log('✅ Printer names loaded from API');
+                }
+            } catch (error) {
+                console.warn('Could not load printer names, using defaults:', error);
+            }
+        }
 
         let currentPrinterId = null;
         let currentPrinterName = null;
@@ -831,7 +878,7 @@
             complete: 'Druck abgeschlossen - Clear Plate wartet'
         };
 
-        function updatePrinterStatus(printerId, status, plateCleared = false) {
+        function updatePrinterStatus(printerId, status, plateCleared = false, progressData = null) {
             const card = document.querySelector(`[data-printer-id="${printerId}"]`);
             const badge = document.getElementById(`status-${printerId}`);
             let btn = card?.querySelector('.clear-plate-btn, .reset-btn, .ready-to-print');
@@ -850,7 +897,16 @@
                 card.classList.add('disabled');
                 btn.disabled = true;
                 btn.classList.remove('blinking');
-                btn.textContent = '[WAIT] Druck läuft...';
+                
+                // Show progress if available
+                let progressText = '[WAIT] Druck läuft...';
+                if (progressData) {
+                    const progress = Math.round(progressData.progress || 0);
+                    const timeLeft = progressData.time_left || '';
+                    progressText = `${progress}% - ${timeLeft}`;
+                }
+                
+                btn.textContent = progressText;
                 btn.className = 'clear-plate-btn';
                 btn.style.background = '#4a5568';
                 btn.style.boxShadow = 'none';
@@ -1035,7 +1091,13 @@
                                 status = 'complete';
                             }
                             
-                            updatePrinterStatus(id, status, plateCleared);
+                            // Pass progress data if available
+                            const progressData = {
+                                progress: data.progress || 0,
+                                time_left: formatTimeLeft(data.time_remaining)
+                            };
+                            
+                            updatePrinterStatus(id, status, plateCleared, progressData);
                         }
                     } catch (err) {
                         console.error(`Fehler beim Abrufen Status für Drucker ${id}:`, err);
@@ -1044,6 +1106,19 @@
             } catch (error) {
                 console.error('Fehler beim Abrufen des Status:', error);
             }
+        }
+
+        // Format time remaining (seconds to HH:MM)
+        function formatTimeLeft(seconds) {
+            if (!seconds || seconds <= 0) return 'Bereit';
+            
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
         }
 
         // Intelligentes Polling: Nur alle 20 Sekunden, spart CPU und Netzwerk
@@ -1215,11 +1290,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Initializing Bambuddy Touch...');
             
-            // Load smart plugs first
-            loadSmartPlugs().then(() => {
-                console.log('✅ Smart plugs loaded');
+            // Load printer names and smart plugs
+            Promise.all([
+                loadPrinterNames(),
+                loadSmartPlugs()
+            ]).then(() => {
+                console.log('✅ Printer names and smart plugs loaded');
             }).catch(err => {
-                console.error('❌ Error loading smart plugs:', err);
+                console.error('❌ Error loading data:', err);
             });
             
             // Start polling printer status

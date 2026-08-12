@@ -10,7 +10,8 @@ Stop:  Ctrl+C oder kill den Prozess
 import os
 import sys
 import json
-import subprocess
+import time  # For JWT token refresh tracking
+import subprocess  # For git pull and systemctl restart
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
@@ -28,7 +29,7 @@ def create_ssl_context():
     except Exception as e:
         print(f"⚠️  Could not load system CA certificates: {e}")
         print("   Falling back to unverified SSL (not recommended for production)")
-        return SSL_CONTEXT
+        return ssl._create_unverified_context()
 
 SSL_CONTEXT = create_ssl_context()
 
@@ -59,11 +60,24 @@ BACKEND_API_KEY = os.getenv('BACKEND_API_KEY', 'bambuddy-local-key')
 
 # JWT token (loaded at startup via login)
 JWT_TOKEN = None
+JWT_EXPIRY_TIME = 25 * 60 * 1000  # Refresh every 25 minutes (token valid for ~30 min)
+LAST_JWT_REFRESH = 0
+
+
+def should_refresh_jwt():
+    """Check if JWT token needs refreshing."""
+    global LAST_JWT_REFRESH
+    now = int(time.time() * 1000)
+    
+    # Refresh if no token or last refresh was more than 25 minutes ago
+    if not JWT_TOKEN or (now - LAST_JWT_REFRESH > JWT_EXPIRY_TIME):
+        return True
+    return False
 
 
 def do_login():
     """Login to Bambu API and store JWT token."""
-    global JWT_TOKEN
+    global JWT_TOKEN, LAST_JWT_REFRESH
     
     if not AUTH_USERNAME or not AUTH_PASSWORD:
         print("⚠️  No credentials in .env — using X-API-Key auth")
@@ -80,6 +94,7 @@ def do_login():
         with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
             data = json.loads(response.read().decode())
             JWT_TOKEN = data.get('access_token', '')
+            LAST_JWT_REFRESH = int(time.time() * 1000)
             if JWT_TOKEN:
                 print(f"✅ Logged in successfully (JWT token obtained)")
                 return True
@@ -99,12 +114,20 @@ def do_login():
 if AUTH_USERNAME and AUTH_PASSWORD:
     do_login()
 
+# Valid printer IDs (security validation)
+VALID_PRINTER_IDS = {'1', '2', '3', '4'}
+
 
 class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     """Handles API proxy requests from the frontend."""
 
     def get_auth_headers(self):
         """Return appropriate auth headers (JWT or X-API-Key)."""
+        # Auto-refresh JWT token if needed
+        if AUTH_USERNAME and AUTH_PASSWORD and should_refresh_jwt():
+            print("🔄 Refreshing JWT token...")
+            do_login()
+        
         headers = {'Accept': 'application/json'}
         
         if JWT_TOKEN:
@@ -131,6 +154,17 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         """Handle GET requests - serve static files or fetch printer status."""
+        
+        # Health check endpoint (no auth required)
+        if self.path == '/api/health':
+            health_data = {
+                "status": "ok",
+                "jwt_refresh_needed": should_refresh_jwt(),
+                "has_credentials": bool(AUTH_USERNAME and AUTH_PASSWORD),
+                "has_token": bool(JWT_TOKEN)
+            }
+            self.send_json_response(200, health_data)
+            return
         
         # API-Schutz: Prüfe API-Key für alle /api/ Endpunkte
         if self.path.startswith('/api/') and not self.check_api_key():
@@ -185,6 +219,12 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             parts = self.path.split('/')  # ['', 'api', 'printers', '1', 'smart-plug']
             if len(parts) >= 5:
                 printer_id = parts[3]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    self.send_json_response(400, {"error": f"Invalid printer ID: {printer_id}"})
+                    return
+                
                 url = f"{API_URL}/smart-plugs/by-printer/{printer_id}"
                 print(f"📡 Proxying GET to: {url}")
                 
@@ -255,6 +295,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             parts = self.path.split('/')  # ['', 'api', 'printers', '1', 'smart-plug', 'control']
             if len(parts) >= 6:
                 printer_id = parts[3]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    self.send_json_response(400, {"error": f"Invalid printer ID: {printer_id}"})
+                    return
                 
                 # First get the smart plug ID for this printer
                 try:
@@ -336,6 +381,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             parts = path.split('/')  # ['', 'api', 'printers', '1', 'status']
             if len(parts) >= 5:
                 printer_id = parts[3]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    raise Exception(f"Invalid printer ID: {printer_id}")
+                
                 url = f"{API_URL}/printers/{printer_id}/status"
             else:
                 raise Exception(f"Invalid path format: {path}")
@@ -344,6 +394,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             parts = path.split('/')  # ['', 'api', 'printers', '1', 'clear-plate']
             if len(parts) >= 5:
                 printer_id = parts[3]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    raise Exception(f"Invalid printer ID: {printer_id}")
+                
                 url = f"{API_URL}/printers/{printer_id}/clear-plate"
             else:
                 raise Exception(f"Invalid path format: {path}")
@@ -352,6 +407,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             parts = path.split('/')  # ['', 'api', '2', 'clear-plate']
             if len(parts) >= 4:
                 printer_id = parts[2]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    raise Exception(f"Invalid printer ID: {printer_id}")
+                
                 url = f"{API_URL}/printers/{printer_id}/clear-plate"
             else:
                 raise Exception(f"Invalid path format: {path}")
@@ -392,10 +452,20 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             # Check if it's /api/printers/{id}/clear-plate format
             if len(parts) >= 5 and parts[2] == 'printers':
                 printer_id = parts[3]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    raise Exception(f"Invalid printer ID: {printer_id}")
+                
                 url = f"{API_URL}/printers/{printer_id}/clear-plate"
             elif len(parts) >= 4:
                 # It's /api/{id}/clear-plate format - convert to proper format
                 printer_id = parts[2]
+                
+                # Validate printer ID (Fix #20)
+                if printer_id not in VALID_PRINTER_IDS:
+                    raise Exception(f"Invalid printer ID: {printer_id}")
+                
                 url = f"{API_URL}/printers/{printer_id}/clear-plate"
             else:
                 raise Exception(f"Invalid path format: {path}")
