@@ -53,8 +53,7 @@ if 'BAMBUDY_API_URL' not in os.environ and Path('.env').exists():
 API_URL = os.getenv('BAMBUDY_API_URL', 'https://DEINE-API-URL.de/api/v1')
 API_KEY = os.getenv('BAMBUDY_API_KEY', '')
 
-# API-Schutz: Key der vom Frontend mitgesendet werden muss (X-API-Key Header)
-BACKEND_API_KEY = os.getenv('BACKEND_API_KEY', 'bambuddy-local-key')
+
 
 
 
@@ -74,15 +73,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         
         return headers
 
-    def check_api_key(self):
-        """Prüft ob der Frontend einen gültigen API-Key mitgesendet hat."""
-        client_key = self.headers.get('X-API-Key', '')
-        if not BACKEND_API_KEY or client_key == BACKEND_API_KEY:
-            return True  # Key deaktiviert oder korrekt
-        
-        print(f"⚠️  Ungültiger API-Key von {self.client_address[0]}")
-        self.send_json_response(401, {"error": "Unauthorized - Invalid API key"})
-        return False
+
 
     def do_GET(self):
         """Handle GET requests - serve static files or fetch printer status."""
@@ -96,9 +87,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             self.send_json_response(200, health_data)
             return
         
-        # API-Schutz: Prüfe API-Key für alle /api/ Endpunkte
-        if self.path.startswith('/api/') and not self.check_api_key():
-            return
+        # No API key check needed for local-only setup
         
         # Update endpoint: /api/update -> run git pull + restart service
         if self.path == '/api/update':
@@ -199,6 +188,9 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
                     return
             except Exception as e:
                 print(f"❌ API Error: {e}")
+                # Send error response to client instead of falling through
+                self.send_json_response(500, {"error": str(e)})
+                return
         
         # Serve other static files (NOT /api/ paths)
         if self.path.startswith('/') and not self.path.startswith('/api/'):
@@ -212,9 +204,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         """Handle POST requests - proxy to API."""
         
-        # API-Schutz: Prüfe API-Key für alle /api/ Endpunkte
-        if self.path.startswith('/api/') and not self.check_api_key():
-            return
+        # No API key check needed for local-only setup
         
         # Read request body
         content_length = int(self.headers.get('Content-Length', 0))
@@ -355,11 +345,11 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         else:
             raise Exception(f"Unsupported path format: {path}")
         
+        headers = self.get_auth_headers()
         print(f"📡 Proxying GET to: {url}")
         print(f"   Headers: {headers}")
         
         req = urllib.request.Request(url)
-        headers = self.get_auth_headers()
         for k, v in headers.items():
             req.add_header(k, v)
         
