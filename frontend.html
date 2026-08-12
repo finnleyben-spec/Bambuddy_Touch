@@ -800,13 +800,12 @@
         const config = { 
             apiUrl: '/api',
             apiKey: '***',  // API-Key für Backend-Schutz
-            fetchTimeout: 60000  // 60 Sekunden Timeout
+            fetchTimeout: 30000  // 30 Sekunden Timeout
         };
 
         async function secureFetch(url, options = {}) {
             const controller = new AbortController();
-            const timeoutMs = config.fetchTimeout || 60000; // Fallback auf 60s wenn nicht gesetzt
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            const timeoutId = setTimeout(() => controller.abort(), config.fetchTimeout);
             
             try {
                 const response = await fetch(url, {
@@ -1004,7 +1003,17 @@
                         document.getElementById('successAnimation').classList.remove('active');
                     }, 1500);
 
-                    // Kein Status-Refresh - wir vertrauen auf den optimistic update oben
+                    // Im Hintergrund echten Status von API laden (korrigiert falls nötig)
+                    try {
+                        const statusResponse = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
+                        if (statusResponse.ok) {
+                            const statusData = await statusResponse.json();
+                            updatePrinterStatus(currentPrinterId, statusData.state || 'idle', statusData.plateCleared);
+                        }
+                    } catch (e) {
+                        console.warn('Konnte Status nach Clear Plate nicht aktualisieren:', e);
+                    }
+                } else {
                     throw new Error('API-Fehler');
                 }
             } catch (error) {
