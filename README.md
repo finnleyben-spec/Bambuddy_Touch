@@ -1,4 +1,4 @@
-# 🖨️ Bambuddy Touch — Smart Printer Dashboard v1.0
+# 🖨️ Bambuddy Touch — Smart Printer Dashboard v1.1
 
 Web-basiertes Interface zum Steuern von Bambu Lab Druckern über die API. Optimiert für Raspberry Pi mit 800×480 Touchscreen.
 
@@ -186,6 +186,19 @@ sudo systemctl restart bambuddy-touch
 - ✅ **Keine externen Abhängigkeiten** — nur Python Standardbibliothek
 - ✅ **Lokaler Zugriff** — Server hört nur auf `127.0.0.1` (localhost)
 - ✅ **Private Repo** — Credentials nicht in Git
+
+---
+
+## 📝 Changelog
+
+### v1.1 (2026-08-12)
+- ✅ **Sofortiges "Ready To Print"** — Nach Clear Plate sofort sichtbar, kein Warten auf API-Poll mehr
+- 🔧 **BrokenPipeError abgefangen** — Backend stürzt nicht mehr ab bei schnellen Requests
+- ⏱️ **Fetch Timeout fixt** — 60s Timeout statt undefined (verhindert "Zeitüberschreitung")
+- 🐛 **Dead Code entfernt** — JavaScript läuft wieder stabil
+
+### v1.0 (2026-08-10)
+- Initial release mit Echtzeit-Status, Smart Plug Control und Clear Plate Funktion
 
 ---
 
