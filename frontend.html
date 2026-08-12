@@ -94,9 +94,9 @@
         header {
             text-align: center;
             margin-bottom: 6px;
-            padding: 4px 12px;
+            padding: 6px 12px;
             background: rgba(255, 255, 255, var(--white-5));
-            border-radius: 8px;
+            border-radius: var(--card-radius);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, var(--white-10));
             display: flex;
@@ -109,7 +109,7 @@
         }
 
         h1 {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 0;
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
@@ -117,7 +117,7 @@
             background-clip: text;
         }
 
-        .version-display { font-size: 9px; color: #718096; margin-top: 1px; }
+        .version-display { font-size: 8px; color: #718096; margin-top: 1px; }
 
         .printers-grid {
             display: grid;
@@ -451,7 +451,7 @@
         .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, var(--white-4)); }
         .update-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
-        /* Update Modal */
+        /* Update Modal - optimized for 800x480 */
         .update-modal-overlay {
             display: none;
             position: fixed;
@@ -461,7 +461,7 @@
             z-index: 2000;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 20px;
         }
 
         .update-modal-overlay.active { display: flex; }
@@ -469,16 +469,16 @@
         .update-modal {
             background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
             border-radius: var(--card-radius);
-            padding: 20px;
-            max-width: 320px;
-            width: 100%;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
             border: 1px solid rgba(255, 255, 255, var(--white-10));
             box-shadow: 0 16px 48px rgba(0, 0, 0, var(--black-50));
         }
 
         .update-modal-icon { font-size: 32px; text-align: center; margin-bottom: 12px; }
-        .update-modal-title { font-size: 16px; font-weight: 600; text-align: center; margin-bottom: 8px; color: #ffffff; }
-        .update-modal-text { color: #a0aec0; text-align: center; margin-bottom: 16px; line-height: 1.4; font-size: 12px; }
+        .update-modal-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 8px; color: #ffffff; }
+        .update-modal-text { color: #a0aec0; text-align: center; margin-bottom: 16px; line-height: 1.4; font-size: 13px; }
 
         .update-progress {
             width: 100%;
@@ -545,25 +545,25 @@
 
         .modal {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 400px;
-            width: 100%;
+            border-radius: var(--card-radius);
+            padding: 24px;
+            max-width: 320px;
+            width: 90%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        .modal-icon { font-size: 48px; text-align: center; margin-bottom: 20px; }
-        .modal-title { font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 12px; color: #ffffff; }
-        .modal-text { color: #a0aec0; text-align: center; margin-bottom: 32px; line-height: 1.6; }
+        .modal-icon { font-size: 36px; text-align: center; margin-bottom: 16px; }
+        .modal-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 12px; color: #ffffff; }
+        .modal-text { color: #a0aec0; text-align: center; margin-bottom: 24px; line-height: 1.5; font-size: 13px; }
 
-        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons { display: flex; gap: 8px; }
 
         .btn-cancel, .btn-confirm {
             flex: 1;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 12px 16px;
+            border-radius: var(--btn-radius);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -585,7 +585,7 @@
             display: none;
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #48bb78 0%, #38b2ff 100%);
-            padding: 40px; border-radius: 20px; z-index: 2000; animation: successPulse 0.6s ease-out;
+            padding: 24px; border-radius: var(--card-radius); z-index: 2000; animation: successPulse 0.6s ease-out;
         }
 
         .success-animation.active { display: block; }
@@ -611,7 +611,29 @@
             h1 { font-size: 24px; }
             .printers-grid { grid-template-columns: 1fr; gap: 15px; }
             .printer-card { padding: 20px; }
-            .modal { padding: 24px; }
+            .modal { padding: 24px; max-width: 320px; }
+        }
+
+        /* Optimized for 800x480 Raspberry Pi Touch Display */
+        @media (max-width: 800px) and (max-height: 480px) {
+            .modal { 
+                max-width: 300px; 
+                padding: 20px;
+            }
+            
+            .modal-icon { font-size: 32px; margin-bottom: 12px; }
+            .modal-title { font-size: 16px; margin-bottom: 8px; }
+            .modal-text { font-size: 12px; margin-bottom: 20px; }
+            
+            .btn-cancel, .btn-confirm { 
+                padding: 10px 14px; 
+                font-size: 13px;
+            }
+            
+            .success-animation { 
+                padding: 20px; 
+                border-radius: var(--card-radius);
+            }
         }
     </style>
 </head>
