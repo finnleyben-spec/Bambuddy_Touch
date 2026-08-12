@@ -1107,6 +1107,9 @@ und API-Key
                                 status = 'printing';
                             } else if (data.progress >= 100 || data.state === 'FINISH') {
                                 status = 'complete';
+                            } else if ((data.state === 'FAILED' || data.state === 'ERROR') && data.current_print) {
+                                // FAILED/ERROR with a current print job → needs reset, regardless of temperature
+                                status = 'error';
                             } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
                                 // Only show error if temperatures are still active (not just stuck in FAILED state)
                                 status = 'error';
