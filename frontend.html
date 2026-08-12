@@ -989,6 +989,15 @@ und API-Key
                     // Status sofort auf "leer" setzen - sofortiges Feedback!
                     updatePrinterStatus(currentPrinterId, 'idle', true);
                     
+                    // Button explizit auf "Ready To Print" setzen (nicht nur blinkend)
+                    const clearBtn = document.querySelector(`[data-printer-id="${currentPrinterId}"] .clear-plate-btn`);
+                    if (clearBtn) {
+                        clearBtn.className = 'ready-to-print';
+                        clearBtn.textContent = 'Ready To Print';
+                        clearBtn.onclick = null;
+                        clearBtn.disabled = false;
+                    }
+                    
                     // Animation nach 1.5s ausblenden (schneller als vorherige 2s)
                     setTimeout(() => {
                         document.getElementById('successAnimation').classList.remove('active');
@@ -1008,11 +1017,21 @@ und API-Key
                     throw new Error('API-Fehler');
                 }
             } catch (error) {
-                alert('Fehler beim Senden des Clear Plate Befehls: ' + error.message);
+                console.error('Clear Plate Fehler:', error);
+                
+                // Zeige Fehler an, aber reaktiviere Button
+                const errorMsg = error.message || 'Unbekannter Fehler';
+                alert(`Fehler beim Clear Plate: ${errorMsg}\n\nDer Button wurde reaktiviert.`);
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'CLEAR PLATE';
                 closeModal();
+                
+                // Stelle sicher dass der Button aktiv ist
+                const card = document.querySelector(`[data-printer-id="${currentPrinterId}"]`);
+                if (card) {
+                    card.classList.remove('disabled');
+                }
             }
         }
 
@@ -1101,6 +1120,24 @@ und API-Key
                         }
                     } catch (err) {
                         console.error(`Fehler beim Abrufen Status für Drucker ${id}:`, err);
+                        
+                        // Reactivate button if it got stuck disabled due to error
+                        const card = document.querySelector(`[data-printer-id="${id}"]`);
+                        const btn = card?.querySelector('.clear-plate-btn, .reset-btn');
+                        if (card && btn) {
+                            card.classList.remove('disabled');
+                            btn.disabled = false;
+                            
+                            // Restore original button state based on current status
+                            const currentState = printerStates[id]?.status || 'idle';
+                            if (currentState === 'printing') {
+                                btn.textContent = '[WAIT] Druck läuft...';
+                            } else {
+                                btn.className = 'clear-plate-btn blinking';
+                                btn.textContent = 'CLEAR PLATE';
+                                btn.onclick = () => openConfirmModal(id, printerStates[id]?.name || `Drucker ${id}`);
+                            }
+                        }
                     }
                 }));  // Close Promise.all and map callback
             } catch (error) {
