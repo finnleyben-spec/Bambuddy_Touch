@@ -176,44 +176,44 @@
         /* Power button in header - inline with name */
         .header-power-btn {
             width: auto;
-            height: 22px;
-            min-width: 50px;
-            padding: 0 8px;
-            border-radius: 6px;
-            font-size: 8px;
+            height: 36px;
+            min-width: 70px;
+            padding: 0 12px;
+            border-radius: 8px;
+            font-size: 10px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 4px;
             white-space: nowrap;
         }
 
         .header-power-btn.on {
-            background: var(--power-on-bg);
+            background: rgba(239, 68, 68, 0.2);
             color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            border: 1px solid rgba(239, 68, 68, 0.5);
         }
 
         .header-power-btn.on:hover {
-            background: rgba(239, 68, 68, var(--white-25));
-            border-color: rgba(239, 68, 68, 0.6);
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.7);
         }
 
         .header-power-btn.off {
-            background: var(--status-idle-bg);
-            color: var(--status-idle-text);
-            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.5);
         }
 
         .header-power-btn.off:hover {
-            background: rgba(16, 185, 129, var(--white-25));
-            border-color: rgba(16, 185, 129, 0.6);
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.7);
         }
 
         .header-power-btn:disabled {
@@ -221,12 +221,23 @@
             cursor: not-allowed;
         }
 
-        .status-idle { background: var(--status-idle-bg); color: var(--status-idle-text); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-printing { background: var(--status-printing-bg); color: var(--status-printing-text); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .status-error { background: var(--status-error-bg); color: var(--status-error-text); border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-complete { background: var(--status-idle-bg); color: var(--status-idle-text); border: 1px solid rgba(16, 185, 129, 0.3); }
+        /* Status badges - improved visibility */
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        /* Clear Plate button - background blinks ON/OFF, text always visible */
+        .status-idle { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .status-printing { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .status-error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .status-complete { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+        /* Version display - improved visibility */
+        .version-display { font-size: 10px; color: #a0aec0; margin-top: 2px; }
         .clear-plate-btn {
             width: 100%;
             padding: 14px 12px;
@@ -561,25 +572,25 @@
 
         .btn-cancel, .btn-confirm {
             flex: 1;
-            padding: 12px 16px;
+            padding: 14px 20px;
             border-radius: var(--btn-radius);
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
-        .btn-cancel { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #a0aec0; }
-        .btn-cancel:hover { background: rgba(255, 255, 255, 0.15); }
+        .btn-cancel { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #e2e8f0; }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.4); }
 
         .btn-confirm {
             background: linear-gradient(135deg, #48bb78 0%, #38b2ff 100%);
-            border: none; color: white; box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            border: none; color: white; box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
         }
 
-        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4); }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5); }
 
         .success-animation {
             display: none;
