@@ -1102,15 +1102,14 @@ und API-Key
                             console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${data.awaiting_plate_clear}`);
                             
                             if (data.state === 'RUNNING' || 
-                                (data.state === 'FAILED' && data.current_print) ||
-                                (data.state === 'ERROR' && data.current_print)) {
-                                // If there's a current print job, treat as printing even in FAILED/ERROR state
+                                ((data.state === 'FAILED' || data.state === 'ERROR') && data.current_print && !isIdleByTemp)) {
+                                // Only show printing if there's a current print AND temperatures are active
                                 status = 'printing';
+                            } else if (data.progress >= 100 || data.state === 'FINISH') {
+                                status = 'complete';
                             } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
                                 // Only show error if temperatures are still active (not just stuck in FAILED state)
                                 status = 'error';
-                            } else if (data.progress >= 100 || data.state === 'FINISH') {
-                                status = 'complete';
                             }
                             
                             // Pass progress data if available
