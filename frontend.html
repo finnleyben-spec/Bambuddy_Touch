@@ -1100,7 +1100,7 @@ und API-Key
                             const awaitingPlateClear = data.awaiting_plate_clear === true;
                             const plateCleared = !awaitingPlateClear;
                             
-                            console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${awaitingPlateClear}`);
+                            console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${awaitingPlateClear}, plateCleared=${plateCleared}`);
                             
                             // PRIMARY SIGNAL: API explicitly says plate needs clearing
                             if (awaitingPlateClear) {
