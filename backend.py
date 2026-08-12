@@ -52,67 +52,11 @@ if 'BAMBUDY_API_URL' not in os.environ and Path('.env').exists():
 # Configuration - ONLY accessible to this server
 API_URL = os.getenv('BAMBUDY_API_URL', 'https://DEINE-API-URL.de/api/v1')
 API_KEY = os.getenv('BAMBUDY_API_KEY', '')
-AUTH_USERNAME = os.getenv('BAMBUDY_AUTH_USERNAME', '')
-AUTH_PASSWORD = os.getenv('BAMBUDY_AUTH_PASSWORD', '')
 
 # API-Schutz: Key der vom Frontend mitgesendet werden muss (X-API-Key Header)
 BACKEND_API_KEY = os.getenv('BACKEND_API_KEY', 'bambuddy-local-key')
 
-# JWT token (loaded at startup via login)
-JWT_TOKEN = None
-JWT_EXPIRY_TIME = 25 * 60 * 1000  # Refresh every 25 minutes (token valid for ~30 min)
-LAST_JWT_REFRESH = 0
 
-
-def should_refresh_jwt():
-    """Check if JWT token needs refreshing."""
-    global LAST_JWT_REFRESH
-    now = int(time.time() * 1000)
-    
-    # Refresh if no token or last refresh was more than 25 minutes ago
-    if not JWT_TOKEN or (now - LAST_JWT_REFRESH > JWT_EXPIRY_TIME):
-        return True
-    return False
-
-
-def do_login():
-    """Login to Bambu API and store JWT token."""
-    global JWT_TOKEN, LAST_JWT_REFRESH
-    
-    if not AUTH_USERNAME or not AUTH_PASSWORD:
-        print("⚠️  No credentials in .env — using X-API-Key auth")
-        return True
-    
-    url = f"{API_URL}/auth/login"
-    payload = json.dumps({"username": AUTH_USERNAME, "password": AUTH_PASSWORD}).encode()
-    
-    req = urllib.request.Request(url, data=payload, method='POST')
-    req.add_header('Content-Type', 'application/json')
-    req.add_header('Accept', 'application/json')
-    
-    try:
-        with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
-            data = json.loads(response.read().decode())
-            JWT_TOKEN = data.get('access_token', '')
-            LAST_JWT_REFRESH = int(time.time() * 1000)
-            if JWT_TOKEN:
-                print(f"✅ Logged in successfully (JWT token obtained)")
-                return True
-            else:
-                print(f"⚠️  Login returned no access_token")
-                return False
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode() if e.fp else ''
-        print(f"❌ Login failed (HTTP {e.code}): {error_body}")
-        return False
-    except Exception as e:
-        print(f"❌ Login error: {e}")
-        return False
-
-
-# Try login at startup if credentials provided
-if AUTH_USERNAME and AUTH_PASSWORD:
-    do_login()
 
 # Valid printer IDs (security validation)
 VALID_PRINTER_IDS = {'1', '2', '3', '4'}
@@ -122,22 +66,10 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
     """Handles API proxy requests from the frontend."""
 
     def get_auth_headers(self):
-        """Return appropriate auth headers (JWT or X-API-Key)."""
-        # Auto-refresh JWT token if needed
-        if AUTH_USERNAME and AUTH_PASSWORD and should_refresh_jwt():
-            print("🔄 Refreshing JWT token...")
-            do_login()
-        
+        """Return auth headers using X-API-Key."""
         headers = {'Accept': 'application/json'}
         
-        if JWT_TOKEN:
-            # Use Bearer token (preferred)
-            headers['Authorization'] = f'Bearer {JWT_TOKEN}'
-        elif API_KEY.startswith('eyJ'):
-            # Legacy JWT in .env
-            headers['Authorization'] = f'Bearer {API_KEY}'
-        else:
-            # Fallback to X-API-Key
+        if API_KEY:
             headers['X-API-Key'] = API_KEY
         
         return headers
@@ -159,9 +91,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         if self.path == '/api/health':
             health_data = {
                 "status": "ok",
-                "jwt_refresh_needed": should_refresh_jwt(),
-                "has_credentials": bool(AUTH_USERNAME and AUTH_PASSWORD),
-                "has_token": bool(JWT_TOKEN)
+                "api_key_configured": bool(API_KEY)
             }
             self.send_json_response(200, health_data)
             return
