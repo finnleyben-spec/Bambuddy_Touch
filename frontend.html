@@ -798,9 +798,10 @@
 
     <script>
         const config = { 
-                    apiUrl: '/api',
-                    apiKey: 'bambu...key'  // API-Key für Backend-Schutz
-                };
+            apiUrl: '/api',
+            apiKey: '***',  // API-Key für Backend-Schutz
+            fetchTimeout: 30000  // 30 Sekunden Timeout
+        };
 
         async function secureFetch(url, options = {}) {
             const controller = new AbortController();
