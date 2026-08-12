@@ -18,6 +18,20 @@ import urllib.request
 import urllib.error
 import ssl  # For SSL verification bypass
 
+# SSL Context with proper certificate validation (not completely disabled)
+def create_ssl_context():
+    """Create SSL context with certificate verification enabled."""
+    try:
+        # Try to use system certificates first
+        context = ssl.create_default_context()
+        return context
+    except Exception as e:
+        print(f"⚠️  Could not load system CA certificates: {e}")
+        print("   Falling back to unverified SSL (not recommended for production)")
+        return SSL_CONTEXT
+
+SSL_CONTEXT = create_ssl_context()
+
 # Load .env file securely (only server-side)
 try:
     from dotenv import load_dotenv
@@ -63,7 +77,7 @@ def do_login():
     req.add_header('Accept', 'application/json')
     
     try:
-        with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
+        with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
             data = json.loads(response.read().decode())
             JWT_TOKEN = data.get('access_token', '')
             if JWT_TOKEN:
@@ -180,7 +194,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
                     req.add_header(k, v)
                 
                 try:
-                    with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
+                    with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
                         data = json.loads(response.read().decode())
                         self.send_response(200)
                         self.send_header('Content-Type', 'application/json')
@@ -250,7 +264,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
                     for k, v in headers.items():
                         req.add_header(k, v)
                     
-                    with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
+                    with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
                         smart_plug_data = json.loads(response.read().decode())
                         
                         if not smart_plug_data or 'id' not in smart_plug_data:
@@ -272,7 +286,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
                             req2.add_header(k, v)
                         req2.add_header('Content-Type', 'application/json')
                         
-                        with urllib.request.urlopen(req2, timeout=10, context=ssl._create_unverified_context()) as response:
+                        with urllib.request.urlopen(req2, timeout=10, context=SSL_CONTEXT) as response:
                             data = json.loads(response.read().decode())
                             self.send_response(200)
                             self.send_header('Content-Type', 'application/json')
@@ -361,7 +375,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
             req.add_header(k, v)
         
         try:
-            with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
+            with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
                 data = json.loads(response.read().decode())
                 return data
         except urllib.error.HTTPError as e:
@@ -402,7 +416,7 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
         req.add_header('Content-Type', 'application/json')
         
         try:
-            with urllib.request.urlopen(req, timeout=10, context=ssl._create_unverified_context()) as response:
+            with urllib.request.urlopen(req, timeout=10, context=SSL_CONTEXT) as response:
                 data = json.loads(response.read().decode())
                 return data, 200
         except urllib.error.HTTPError as e:

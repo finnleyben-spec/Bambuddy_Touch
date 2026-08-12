@@ -920,7 +920,7 @@
 
             try {
                 // POST-Anfrage senden (kann auf dem Pi etwas dauern)
-                const response = await secureFetch(`${config.apiUrl}/${currentPrinterId}/clear-plate`, {
+                const response = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/clear-plate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'idle' })
@@ -1059,24 +1059,6 @@
             setTimeout(smartPoll, 5000); // Prüfe alle 5 Sekunden ob Zeit für Polling da ist
         }
 
-        // Initialisierung
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Initializing Bambuddy Touch...');
-            
-            // Load smart plugs first
-            loadSmartPlugs().then(() => {
-                console.log('✅ Smart plugs loaded');
-            }).catch(err => {
-                console.error('❌ Error loading smart plugs:', err);
-            });
-            
-            // Start polling printer status
-            pollPrinterStatus();
-            
-            // Intelligentes Polling starten
-            smartPoll();
-        });
-
         // Modal schließen bei Klick außerhalb
         document.getElementById('confirmModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('confirmModal')) {
@@ -1114,10 +1096,14 @@
         function updatePowerUI(printerId, data) {
             const card = document.querySelector(`[data-printer-id="${printerId}"]`);
             const btn = document.getElementById(`power-btn-${printerId}`);
-            const statusEl = document.getElementById(`power-status-${printerId}`);
             
             if (!data || !data.id) {
-                // No smart plug found
+                // No smart plug found - keep button but show disabled state
+                if (btn) {
+                    btn.textContent = 'Keine Steckdose';
+                    btn.disabled = true;
+                    btn.className = 'power-toggle-btn off';
+                }
                 return;
             }
             
@@ -1127,20 +1113,13 @@
             if (btn) {
                 btn.textContent = isOn ? 'PWR OFF' : 'PWR ON';
                 btn.className = `power-toggle-btn ${isOn ? 'on' : 'off'}`;
+                btn.disabled = false;
             }
             
-            // Update status text
-            if (statusEl) {
-                statusEl.textContent = isOn ? 'PLUG ON' : 'PLUG OFF';
-                statusEl.className = `power-status-text ${isOn ? 'on' : 'off'}`;
-            }
-            
-            // Dim card if power is off
+            // Dim card if power is off (only dim non-power elements)
             if (card) {
                 if (!isOn) {
                     card.classList.add('power-off');
-                    const statusText = document.getElementById(`status-text-${printerId}`);
-                    if (statusText) statusText.textContent = 'PLUG OFF';
                 } else {
                     card.classList.remove('power-off');
                 }
@@ -1232,7 +1211,7 @@
             }
         }
         
-        // Load smart plugs on page load
+        // Load smart plugs on page load (single initialization)
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Initializing Bambuddy Touch...');
             
