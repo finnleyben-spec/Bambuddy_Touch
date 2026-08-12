@@ -1003,16 +1003,7 @@
                         document.getElementById('successAnimation').classList.remove('active');
                     }, 1500);
 
-                    // Im Hintergrund echten Status von API laden (korrigiert falls nötig)
-                    try {
-                        const statusResponse = await secureFetch(`${config.apiUrl}/printers/${currentPrinterId}/status`);
-                        if (statusResponse.ok) {
-                            const statusData = await statusResponse.json();
-                            updatePrinterStatus(currentPrinterId, statusData.state || 'idle', statusData.plateCleared);
-                        }
-                    } catch (e) {
-                        console.warn('Konnte Status nach Clear Plate nicht aktualisieren:', e);
-                    }
+
                 } else {
                     throw new Error('API-Fehler');
                 }
