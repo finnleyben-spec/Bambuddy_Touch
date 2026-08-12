@@ -432,13 +432,17 @@ class BambuddyProxyHandler(SimpleHTTPRequestHandler):
 
     def send_json_response(self, status_code, data):
         """Send a JSON response."""
-        body = json.dumps(data).encode()
-        self.send_response(status_code)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Content-Length', len(body))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            body = json.dumps(data).encode()
+            self.send_response(status_code)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', len(body))
+            self.end_headers()
+            self.wfile.write(body)
+        except BrokenPipeError:
+            # Client closed connection before we could send response
+            pass
 
     def log_message(self, format, *args):
         """Log requests to console."""
