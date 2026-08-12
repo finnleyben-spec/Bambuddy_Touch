@@ -1097,19 +1097,20 @@ und API-Key
                             const isIdleByTemp = (nozzleTarget === 0 && bedTarget === 0);
                             
                             // Check if plate has been cleared
-                            const plateCleared = data.awaiting_plate_clear === false;
+                            const awaitingPlateClear = data.awaiting_plate_clear === true;
+                            const plateCleared = !awaitingPlateClear;
                             
-                            console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${data.awaiting_plate_clear}`);
+                            console.log(`Printer ${id}: state=${data.state}, progress=${data.progress}%, awaiting_plate_clear=${awaitingPlateClear}`);
                             
-                            if (data.state === 'RUNNING' || 
+                            // PRIMARY SIGNAL: API explicitly says plate needs clearing
+                            if (awaitingPlateClear) {
+                                status = 'complete';  // Will show CLEAR PLATE button in updatePrinterStatus
+                            } else if (data.state === 'RUNNING' || 
                                 ((data.state === 'FAILED' || data.state === 'ERROR') && data.current_print && !isIdleByTemp)) {
                                 // Only show printing if there's a current print AND temperatures are active
                                 status = 'printing';
                             } else if (data.progress >= 100 || data.state === 'FINISH') {
                                 status = 'complete';
-                            } else if ((data.state === 'FAILED' || data.state === 'ERROR') && data.current_print) {
-                                // FAILED/ERROR with a current print job → needs reset, regardless of temperature
-                                status = 'error';
                             } else if ((data.state === 'FAILED' || data.state === 'ERROR') && !isIdleByTemp) {
                                 // Only show error if temperatures are still active (not just stuck in FAILED state)
                                 status = 'error';
