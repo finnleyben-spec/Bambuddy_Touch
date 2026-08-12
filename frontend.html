@@ -798,11 +798,10 @@
 
     <script>
         const config = { 
-            apiUrl: '/api',
-            apiKey: 'bambuddy-local-key'  // API-Key für Backend-Schutz
-        };
+                    apiUrl: '/api',
+                    apiKey: 'bambu...key'  // API-Key für Backend-Schutz
+                };
 
-und API-Key
         async function secureFetch(url, options = {}) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), config.fetchTimeout);
