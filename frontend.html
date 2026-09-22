@@ -275,7 +275,7 @@
             transition: transform 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 4px 20px rgba(251, 191, 36, var(--white-4));
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.18);
             flex-grow: 1;
             display: flex;
             align-items: center;
@@ -310,7 +310,10 @@
         }
         body.blink-on .clear-plate-btn.blinking {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            box-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 80px rgba(251, 191, 36, 0.6), 0 4px 20px rgba(251, 191, 36, 0.4);
+            /* Dezent: ein einzelner, weicher Glow (kein Dreifach-Schatten),
+               damit der Karten-Rahmen dahinter nicht verdeckt wird und
+               der Button-Text klar lesbar bleibt. Auffällig durch Füllung. */
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
             border-color: #fbbf24;
         }
 
@@ -763,7 +766,7 @@
         <header>
             <div class="header-left">
                 <h1>Bambuddy Control</h1>
-                <p class="version-display" id="versionDisplay">v1.4</p>
+                <p class="version-display" id="versionDisplay">v1.5</p>
             </div>
             <button class="update-btn" onclick="openUpdateModal()">UPDATE</button>
         </header>
