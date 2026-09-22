@@ -299,24 +299,19 @@
         .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: var(--gray-disabled); box-shadow: none; border-color: rgba(251, 191, 36, 0.4); }
 
         /* Synchrones Blinken: EIN zentraler Timer (body.blink-on, JS unten)
-           schaltet --blink-glow für den ganzen Body auf 0/1. ALLE
-           .blinking-Buttons leiten Background, Glow und Border von dieser
-           einen Variable ab (calc) — dadurch sind sie garantiert exakt
-           synchron, egal wann JS einzelne Buttons umschaltet. Die
-           bestehende 'transition: all 0.3s' auf dem Button blendet den
-           Glow-Wechsel weich ein/aus (gleiche Kurve für jeden Button). */
-        body { --blink-glow: 0; }
-        body.blink-on { --blink-glow: 1; }
+           schaltet die Phase für den gesamten Body. ALLE .blinking-Buttons
+           leuchten nur, wenn body.blink-on gesetzt ist — dadurch sind sie
+           garantiert exakt synchron. Explizite Selektoren statt CSS-Variablen
+           (Pi-Chromium unterstützt var() in rgba()-Alpha nicht zuverlässig). */
         .clear-plate-btn.blinking {
-            background: linear-gradient(
-                rgba(251, 191, 36, var(--blink-glow)),
-                rgba(217, 119, 6, var(--blink-glow))
-            );
-            box-shadow:
-                0 0 40px rgba(251, 191, 36, var(--blink-glow)),
-                0 0 80px rgba(251, 191, 36, calc(0.6 * var(--blink-glow))),
-                0 4px 20px rgba(251, 191, 36, calc(0.4 * var(--blink-glow)));
-            border-color: rgba(251, 191, 36, calc(0.3 + 0.7 * var(--blink-glow)));
+            background: transparent;
+            box-shadow: none;
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+        body.blink-on .clear-plate-btn.blinking {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            box-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 80px rgba(251, 191, 36, 0.6), 0 4px 20px rgba(251, 191, 36, 0.4);
+            border-color: #fbbf24;
         }
 
         /* Text always visible - no opacity changes */
@@ -952,6 +947,11 @@
             } else if (status === 'complete') {
                 card.classList.remove('disabled');
                 btn.disabled = false;
+                // Inline-Styles aus 'printing' löschen — die hätten die
+                // höchste Spezifität und würden das Blinken (Background/Glow)
+                // für immer überstimmen: nur der Border-Ring würde leuchten.
+                btn.style.background = '';
+                btn.style.boxShadow = '';
                 
                 if (plateCleared) {
                     // Show "Ready To Print" button when plate is cleared and print is complete
@@ -969,6 +969,9 @@
                 // idle - check if plate has been cleared
                 card.classList.remove('disabled');
                 btn.disabled = false;
+                // Inline-Styles aus 'printing' löschen (wie im complete-Zweig)
+                btn.style.background = '';
+                btn.style.boxShadow = '';
                 btn.classList.remove('blinking');
                 
                 if (plateCleared) {
