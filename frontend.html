@@ -31,6 +31,7 @@
             --status-error-text: #fca5a5;
 
             /* Farben - Weiß */
+            --white-4: 0.4;
             --white-5: rgba(255, 255, 255, 0.05);
             --white-6: rgba(255, 255, 255, 0.06);
             --white-8: rgba(255, 255, 255, 0.08);
@@ -269,7 +270,9 @@
             font-size: 16px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s ease;
+            /* NICHT 'all': animierte calc()-Werte (Glow) würden bei Chromium
+               einfrieren. Transform allein genügt für Hover/Active. */
+            transition: transform 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 4px 20px rgba(251, 191, 36, var(--white-4));
@@ -295,13 +298,25 @@
         .clear-plate-btn:active:not(:disabled) { transform: translateY(0); }
         .clear-plate-btn:disabled { opacity: 0.6; cursor: not-allowed; background: var(--gray-disabled); box-shadow: none; border-color: rgba(251, 191, 36, 0.4); }
 
-        @keyframes yellowBlink {
-            0%, 49%   { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 80px rgba(251, 191, 36, 0.6), 0 4px 20px rgba(251, 191, 36, var(--white-4)); border-color: #fbbf24; }
-            50%, 99%  { background: transparent; box-shadow: none; border-color: rgba(251, 191, 36, 0.8); }
-        }
-
+        /* Synchrones Blinken: EIN zentraler Timer (body.blink-on, JS unten)
+           schaltet --blink-glow für den ganzen Body auf 0/1. ALLE
+           .blinking-Buttons leiten Background, Glow und Border von dieser
+           einen Variable ab (calc) — dadurch sind sie garantiert exakt
+           synchron, egal wann JS einzelne Buttons umschaltet. Die
+           bestehende 'transition: all 0.3s' auf dem Button blendet den
+           Glow-Wechsel weich ein/aus (gleiche Kurve für jeden Button). */
+        body { --blink-glow: 0; }
+        body.blink-on { --blink-glow: 1; }
         .clear-plate-btn.blinking {
-            animation: yellowBlink 1.5s steps(1) infinite;
+            background: linear-gradient(
+                rgba(251, 191, 36, var(--blink-glow)),
+                rgba(217, 119, 6, var(--blink-glow))
+            );
+            box-shadow:
+                0 0 40px rgba(251, 191, 36, var(--blink-glow)),
+                0 0 80px rgba(251, 191, 36, calc(0.6 * var(--blink-glow))),
+                0 4px 20px rgba(251, 191, 36, calc(0.4 * var(--blink-glow)));
+            border-color: rgba(251, 191, 36, calc(0.3 + 0.7 * var(--blink-glow)));
         }
 
         /* Text always visible - no opacity changes */
@@ -799,9 +814,25 @@
     <script>
         const config = { 
             apiUrl: '/api',
-            apiKey: '***',  // API-Key für Backend-Schutz
+            apiKey: 'bambuddy-local',  // API-Key für Backend-Schutz
             fetchTimeout: 30000  // 30 Sekunden Timeout
         };
+
+        // Zentrale Blink-Taktgeberin: EIN setInterval für den ganzen Body.
+        // Alle .clear-plate-btn.blinking-Buttons leuchten, solange body.blink-on
+        // gesetzt ist — dadurch blinken ALLE exakt synchron, egal wann die
+        // .blinking-Klasse von JS hinzugefügt/entfernt wurde.
+        const BLINK_PERIOD = 1500; // ms (750 an / 750 aus)
+        let blinkTimer = null;
+
+        function startBlinkClock() {
+            if (blinkTimer) return;
+            blinkTimer = setInterval(() => {
+                document.body.classList.toggle('blink-on');
+            }, BLINK_PERIOD / 2);
+            document.body.classList.add('blink-on');
+        }
+        startBlinkClock();
 
         async function secureFetch(url, options = {}) {
             const controller = new AbortController();
