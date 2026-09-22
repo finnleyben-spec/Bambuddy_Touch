@@ -600,6 +600,58 @@
         .modal-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 12px; color: #ffffff; }
         .modal-text { color: #a0aec0; text-align: center; margin-bottom: 24px; line-height: 1.5; font-size: 13px; }
 
+        /* Clear-Plate-Bestätigung: groß, zentriert, gold, auffällig.
+           Flex-Column mit festen Margins — nichts überlappt, alles symmetrisch. */
+        .modal-clear {
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border-color: rgba(251, 191, 36, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(251, 191, 36, 0.15);
+        }
+        .clear-icon {
+            color: #fbbf24;
+            font-size: 44px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin: 0 0 14px 0;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+        }
+        .clear-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: #fbbf24;
+            letter-spacing: 2px;
+            margin: 0 0 14px 0;
+            text-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+        }
+        .clear-warn {
+            color: #fbd38d;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.6;
+            margin: 0 16px 28px 16px;
+        }
+        .clear-warn strong { color: #fbbf24; }
+        .modal-clear .modal-buttons {
+            width: 100%;
+            box-sizing: border-box;
+            gap: 12px;
+        }
+        .modal-clear .btn-cancel,
+        .modal-clear .btn-confirm {
+            padding: 18px 24px;
+            font-size: 17px;
+        }
+        .modal-clear .btn-confirm {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.5);
+        }
+        .modal-clear .btn-confirm:hover { box-shadow: 0 6px 26px rgba(251, 191, 36, 0.6); }
+
         .modal-buttons { display: flex; gap: 8px; }
 
         .btn-cancel, .btn-confirm {
@@ -660,18 +712,24 @@
         /* Optimized for 800x480 Raspberry Pi Touch Display */
         @media (max-width: 800px) and (max-height: 480px), 
                (min-resolution: 1dppx) {
-            .modal { 
+            .modal:not(.modal-clear) { 
                 max-width: 320px; 
                 padding: 24px;
             }
             
             .modal-icon { font-size: 36px; margin-bottom: 16px; }
-            .modal-title { font-size: 18px; margin-bottom: 12px; }
-            .modal-text { font-size: 13px; margin-bottom: 24px; }
+            .modal-title:not(.clear-title) { font-size: 18px; margin-bottom: 12px; }
+            .modal-text:not(.clear-warn) { font-size: 13px; margin-bottom: 24px; }
             
             .btn-cancel, .btn-confirm { 
                 padding: 14px 20px; 
                 font-size: 15px;
+            }
+            
+            /* Clear-Plate-Bestätigung bleibt groß (Media-Query-Override) */
+            .modal-clear .btn-cancel, .modal-clear .btn-confirm {
+                padding: 18px 24px;
+                font-size: 17px;
             }
             
             .success-animation { 
@@ -705,7 +763,7 @@
         <header>
             <div class="header-left">
                 <h1>Bambuddy Control</h1>
-                <p class="version-display" id="versionDisplay">v1.3</p>
+                <p class="version-display" id="versionDisplay">v1.4</p>
             </div>
             <button class="update-btn" onclick="openUpdateModal()">UPDATE</button>
         </header>
@@ -755,10 +813,13 @@
 
     <!-- Confirmation Modal -->
     <div class="modal-overlay" id="confirmModal">
-        <div class="modal">
-            <div class="modal-icon">[ ]</div>
-            <h2 class="modal-title">Clear Plate bestätigen?</h2>
-            <p class="modal-text" id="modalText">Möchtest du die Druckplatte von <strong>X1 Carbon #1</strong> als leer markieren?</p>
+        <div class="modal modal-clear">
+            <div class="modal-icon clear-icon">[!]</div>
+            <h2 class="modal-title clear-title">CLEAR PLATE BESTÄTIGEN?</h2>
+            <p class="modal-text clear-warn" id="modalText">
+                <strong>WIRKLICH ALLES VOM DRUCKBETT RUNTER?</strong><br>
+                Keine Reste mehr auf dem Druckbett — <strong id="modalPrinter">X1 Carbon #1</strong>
+            </p>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
                 <button class="btn-confirm" id="confirmBtn" onclick="confirmClearPlate()">Bestätigen</button>
@@ -991,7 +1052,7 @@
         function openConfirmModal(printerId, printerName) {
             currentPrinterId = printerId;
             currentPrinterName = printerName;
-            document.getElementById('modalText').innerHTML = `Möchtest du die Druckplatte von <strong>${printerName}</strong> als leer markieren?`;
+            document.getElementById('modalPrinter').textContent = printerName;
             document.getElementById('confirmModal').classList.add('active');
         }
 
